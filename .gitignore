@@ -179,3 +179,13 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# Ignore everything inside any docs folder (recursive)
+docs/**
+
+# Allow docs directories themselves (so unignored files can be seen)
+!docs
+!docs/**/
+
+# Re-include any .gitkeep inside docs (works at any depth)
+!docs/**/.gitkeep
