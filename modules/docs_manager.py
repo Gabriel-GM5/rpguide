@@ -14,7 +14,7 @@ class DocsManager:
         for type in self.local_knowledge_doc_types:
             match type:
                 case "pdfs":
-                    for doc in base_dir.joinpath(self.local_knowledge_path, type).glob("*.pdf"):
+                    for doc in base_dir.joinpath(self.local_knowledge_path, type).glob("**/*.pdf"):
                         try:
                             loader = PyMuPDFLoader(str(doc))
                             docs.extend(loader.load())
