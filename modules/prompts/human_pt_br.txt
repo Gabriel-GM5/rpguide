@@ -1,1 +1,1 @@
-Pergunta: {QUERY}\n\nContexto:\n{CONTEXT}
+Pergunta: {input}\n\nContexto:\n{context}

@@ -29,6 +29,7 @@ class Config:
     AI_PERSONA = os.getenv("AI_PERSONA")
     LOCAL_KNOWLEDGE_PATH = os.getenv("LOCAL_KNOWLEDGE_PATH")
     LOCAL_KNOWLEDGE_DOC_TYPES = os.getenv("LOCAL_KNOWLEDGE_DOC_TYPES").split(",")
+    EMBEDDINGS_AI_MODEL = os.getenv("EMBEDDINGS_AI_MODEL")
     texts = load_texts(f"texts/{LANGUAGE}.properties")
 
 config = Config()
