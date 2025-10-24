@@ -1,2 +1,2 @@
 # rpguide
-Personal Assistant for General fun usage
+Personal Persona Based Assistant for General Purposes Usage
