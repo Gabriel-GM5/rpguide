@@ -1,2 +1,2 @@
 # rpguide
-Personal Persona Based Assistant for General Purposes Usage
+Personal Persona-Based AI Assistant for General Purposes Usage
