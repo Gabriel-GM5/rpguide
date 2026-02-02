@@ -15,7 +15,7 @@ class PromptsManager:
     def _load_prompt(self, prompt_type):
         import os
         base_dir = os.path.dirname(__file__)
-        file_path = os.path.join(base_dir, "prompts", f"{prompt_type}_{self.config.LANGUAGE}.txt")
+        file_path = os.path.join(base_dir, "prompts", f"{prompt_type}_en_us.txt")
 
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"Prompt file not found: {file_path}")

@@ -32,6 +32,8 @@ class Config:
     EMBEDDINGS_AI_MODEL = os.getenv("EMBEDDINGS_AI_MODEL")
     # Debug flag: set to true/1/yes to enable agent debug prints
     DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes", "y")
+    # Mode: "gui" for graphical interface or "terminal" for command-line chat
+    MODE = os.getenv("MODE", "gui").lower()
     texts = load_texts(f"texts/{LANGUAGE}.properties")
 
 config = Config()
