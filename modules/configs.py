@@ -30,6 +30,8 @@ class Config:
     LOCAL_KNOWLEDGE_PATH = os.getenv("LOCAL_KNOWLEDGE_PATH")
     LOCAL_KNOWLEDGE_DOC_TYPES = os.getenv("LOCAL_KNOWLEDGE_DOC_TYPES").split(",")
     EMBEDDINGS_AI_MODEL = os.getenv("EMBEDDINGS_AI_MODEL")
+    # Debug flag: set to true/1/yes to enable agent debug prints
+    DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes", "y")
     texts = load_texts(f"texts/{LANGUAGE}.properties")
 
 config = Config()

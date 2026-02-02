@@ -6,6 +6,11 @@ class PromptsManager:
         system_prompt_template = self._load_prompt("system")
         self.system_prompt = system_prompt_template.replace("{PERSONA_DESCRIPTION}", self.config.AI_PERSONA).replace("{EXIT_COMMAND}", self.config.texts['exit.term'])
         self.human_prompt = self._load_prompt("human")
+        # Load analyzer prompt (used by PromptAnalyzerAgent)
+        try:
+            self.analyzer_prompt = self._load_prompt("analyzer")
+        except FileNotFoundError:
+            self.analyzer_prompt = None
 
     def _load_prompt(self, prompt_type):
         import os
@@ -20,3 +25,6 @@ class PromptsManager:
 
     def get_prompts(self):
         return ChatPromptTemplate.from_messages([("system", self.system_prompt), ("human", self.human_prompt)])
+
+    def get_analyzer_prompt(self):
+        return self.analyzer_prompt
