@@ -1,26 +1,94 @@
-from langchain_community.document_loaders import PyMuPDFLoader
 from pathlib import Path
+from modules.configs import config
+
+from langchain_community.document_loaders import (
+    PyMuPDFLoader,
+    TextLoader,
+    CSVLoader,
+    UnstructuredMarkdownLoader,
+    UnstructuredHTMLLoader,
+    UnstructuredPowerPointLoader,
+    UnstructuredWordDocumentLoader,
+    UnstructuredRTFLoader,
+)
+
+from langchain_unstructured import UnstructuredLoader
+
 
 class DocsManager:
     def __init__(self, config):
         self.local_knowledge_path = config.LOCAL_KNOWLEDGE_PATH
-        self.local_knowledge_doc_types = config.LOCAL_KNOWLEDGE_DOC_TYPES
         self.config = config
 
+        self.specialized_loaders = {
+            ".pdf": PyMuPDFLoader,
+            ".txt": TextLoader,
+            ".csv": CSVLoader,
+            ".md": UnstructuredMarkdownLoader,
+            ".html": UnstructuredHTMLLoader,
+            ".htm": UnstructuredHTMLLoader,
+
+            # Word / Rich text
+            ".docx": UnstructuredWordDocumentLoader,
+            ".doc": UnstructuredWordDocumentLoader,
+            ".rtf": UnstructuredRTFLoader,
+
+            # PowerPoint
+            ".pptx": UnstructuredPowerPointLoader,
+            ".ppt": UnstructuredPowerPointLoader,
+        }
+
+    def _load(self, loader_cls, file_path):
+        loader = loader_cls(str(file_path))
+        return loader.load()
 
     def getDocs(self):
         docs = []
         base_dir = Path(__file__).resolve().parent.parent
-        for type in self.local_knowledge_doc_types:
-            match type:
-                case "pdfs":
-                    for doc in base_dir.joinpath(self.local_knowledge_path, type).glob("**/*.pdf"):
-                        try:
-                            loader = PyMuPDFLoader(str(doc))
-                            docs.extend(loader.load())
-                            print(f"{self.config.texts['file']} {doc.name} {self.config.texts['loaded.successfully']}")
-                        except Exception as e:
-                            print(f"{self.config.texts['file.loading.error']} {doc.name}: {e}")
-                case _:
-                    print(f"{self.config.texts['file.type.skipped']}: {type}")
+        knowledge_dir = base_dir / self.local_knowledge_path
+
+        for file in knowledge_dir.glob("**/*"):
+            if not file.is_file():
+                continue
+
+            # 🚫 Skip dotfiles with no extension (.gitkeep, .env, etc.)
+            if file.name.startswith(".") and file.suffix == "":
+                continue
+
+            ext = file.suffix.lower()
+
+            # 1️⃣ Specialized loader first
+            loader_cls = self.specialized_loaders.get(ext)
+            if loader_cls:
+                try:
+                    docs.extend(self._load(loader_cls, file))
+                    if config.DEBUG:
+                        print(
+                            f"{self.config.texts['file']} {file.name} "
+                            f"{self.config.texts['loaded.successfully']} (specialized)"
+                        )
+                    continue
+                except Exception as e:
+                    if config.DEBUG:
+                        print(
+                            f"{self.config.texts['file.loading.error']} "
+                            f"{file.name} (specialized): {e}"
+                        )
+
+            # 2️⃣ Generic unstructured fallback
+            try:
+                loader = UnstructuredLoader(str(file))
+                docs.extend(loader.load())
+                if config.DEBUG:
+                    print(
+                        f"{self.config.texts['file']} {file.name} "
+                        f"{self.config.texts['loaded.successfully']} (unstructured fallback)"
+                    )
+            except Exception as e:
+                if config.DEBUG:
+                    print(
+                        f"{self.config.texts['file.loading.error']} "
+                        f"{file.name} (unstructured): {e}"
+                    )
+
         return docs

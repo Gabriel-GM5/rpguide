@@ -6,7 +6,6 @@ class PromptsManager:
         system_prompt_template = self._load_prompt("system")
         self.system_prompt = system_prompt_template.replace("{PERSONA_DESCRIPTION}", self.config.AI_PERSONA).replace("{EXIT_COMMAND}", self.config.texts['exit.term'])
         self.human_prompt = self._load_prompt("human")
-        # Load analyzer prompt (used by PromptAnalyzerAgent)
         try:
             self.analyzer_prompt = self._load_prompt("analyzer")
         except FileNotFoundError:

@@ -75,10 +75,15 @@ class ChatApp:
     
     def get_greeting_response(self, question):
         """Get greeting response in background thread."""
-        response = self.connector.call(question)
-        self.root.after(0, lambda: self.display_message(self.config.AI_PERSONA, response, is_user=False))
-        self.root.after(0, lambda: self.input_field.config(state=NORMAL))
-        self.root.after(0, lambda: self.input_field.focus())
+        try:
+            response = self.connector.call(question)
+            self.root.after(0, lambda: self.display_message(self.config.AI_PERSONA, response, is_user=False))
+        except Exception as e:
+            error_msg = self.config.texts.get('error.connection', f'Error: {str(e)}')
+            self.root.after(0, lambda: self.display_message('System', error_msg, is_user=False))
+        finally:
+            self.root.after(0, lambda: self.input_field.config(state=NORMAL))
+            self.root.after(0, lambda: self.input_field.focus())
     
     def send_message(self, event=None):
         """Send user message and get response."""
@@ -103,10 +108,15 @@ class ChatApp:
     
     def get_response(self, question):
         """Get AI response in background thread."""
-        response = self.connector.call(question)
-        self.root.after(0, lambda: self.display_message(self.config.AI_PERSONA, response, is_user=False))
-        self.root.after(0, lambda: self.input_field.config(state=NORMAL))
-        self.root.after(0, lambda: self.input_field.focus())
+        try:
+            response = self.connector.call(question)
+            self.root.after(0, lambda: self.display_message(self.config.AI_PERSONA, response, is_user=False))
+        except Exception as e:
+            error_msg = self.config.texts.get('error.connection', f'Error: {str(e)}')
+            self.root.after(0, lambda: self.display_message('System', error_msg, is_user=False))
+        finally:
+            self.root.after(0, lambda: self.input_field.config(state=NORMAL))
+            self.root.after(0, lambda: self.input_field.focus())
     
     def display_message(self, sender, message, is_user=True):
         """Display a message in the chat window."""
@@ -128,9 +138,14 @@ class ChatApp:
         self.input_field.config(state=DISABLED)
         
         def close_app():
-            response = self.connector.call(farewell_question)
-            self.root.after(0, lambda: self.display_message(self.config.AI_PERSONA, response, is_user=False))
-            self.root.after(1500, self.root.quit)
+            try:
+                response = self.connector.call(farewell_question)
+                self.root.after(0, lambda: self.display_message(self.config.AI_PERSONA, response, is_user=False))
+            except Exception as e:
+                farewell_msg = self.config.texts.get('final.message', 'Goodbye!')
+                self.root.after(0, lambda: self.display_message('System', farewell_msg, is_user=False))
+            finally:
+                self.root.after(1500, self.root.quit)
         
         thread = threading.Thread(target=close_app)
         thread.daemon = True
@@ -139,59 +154,94 @@ class ChatApp:
 
 def run_gui():
     """Run the GUI chat interface."""
-    root = ttk.Window(themename="darkly")
-    app = ChatApp(root)
-    root.mainloop()
+    try:
+        root = ttk.Window(themename="darkly")
+        app = ChatApp(root)
+        root.mainloop()
+    except Exception as e:
+        print(f"GUI Error: {str(e)}")
+        print("The application encountered an error and will close.")
+        sys.exit(1)
 
 
 def run_terminal():
     """Run the terminal-based chat interface."""
-    config = Config()
-    connector = ConnectorManager(config)
-    
-    # Show initial greeting
-    greeting_question = config.texts.get('initial.question', 'Introduce yourself.')
-    response = connector.call(greeting_question)
-    print(f"{config.AI_PERSONA}: {response}\n")
-    
-    # Chat loop
-    while True:
-        question = input(f"{config.texts['user.pronoun']}: ").strip()
+    try:
+        config = Config()
+        connector = ConnectorManager(config)
         
-        if not question:
-            continue
+        # Show initial greeting
+        greeting_question = config.texts.get('initial.question', 'Introduce yourself.')
+        try:
+            response = connector.call(greeting_question)
+            print(f"{config.AI_PERSONA}: {response}\n")
+        except Exception as e:
+            error_msg = config.texts.get('error.connection', f'Error: {str(e)}')
+            print(f"System: {error_msg}\n")
         
-        # Check for exit command
-        if question.lower() == config.texts['exit.term'].lower():
-            farewell_question = config.texts.get('final.question', 'Goodbye.')
-            response = connector.call(farewell_question)
-            print(f"{config.AI_PERSONA}: {response}")
-            break
-        
-        # Get and display response
-        response = connector.call(question)
-        print(f"{config.AI_PERSONA}: {response}\n")
+        # Chat loop
+        while True:
+            try:
+                question = input(f"{config.texts['user.pronoun']}: ").strip()
+                
+                if not question:
+                    continue
+                
+                # Check for exit command
+                if question.lower() == config.texts['exit.term'].lower():
+                    farewell_question = config.texts.get('final.question', 'Goodbye.')
+                    try:
+                        response = connector.call(farewell_question)
+                        print(f"{config.AI_PERSONA}: {response}")
+                    except Exception:
+                        farewell_msg = config.texts.get('final.message', 'Goodbye!')
+                        print(f"System: {farewell_msg}")
+                    break
+                
+                # Get and display response
+                try:
+                    response = connector.call(question)
+                    print(f"{config.AI_PERSONA}: {response}\n")
+                except Exception as e:
+                    error_msg = config.texts.get('error.connection', f'Error: {str(e)}')
+                    print(f"System: {error_msg}\n")
+            except KeyboardInterrupt:
+                farewell_msg = config.texts.get('final.message', 'Goodbye!')
+                print(f"\nSystem: {farewell_msg}")
+                break
+            except Exception as e:
+                error_msg = config.texts.get('error.unexpected', f'Unexpected error: {str(e)}')
+                print(f"System: {error_msg}\n")
+    except Exception as e:
+        print(f"Terminal Error: {str(e)}")
+        print("The application encountered an error and will close.")
+        sys.exit(1)
 
 
 def main():
-    config = Config()
-    
-    # Determine mode: command-line argument takes precedence over .env
-    mode = config.MODE  # Default from .env
-    
-    if len(sys.argv) > 1:
-        arg_mode = sys.argv[1].lower()
-        if arg_mode in ("gui", "terminal"):
-            mode = arg_mode
+    try:
+        config = Config()
+        
+        # Determine mode: command-line argument takes precedence over .env
+        mode = config.MODE  # Default from .env
+        
+        if len(sys.argv) > 1:
+            arg_mode = sys.argv[1].lower()
+            if arg_mode in ("gui", "terminal"):
+                mode = arg_mode
+            else:
+                print(f"Invalid mode argument: {arg_mode}")
+                print("Usage: python3 main.py [gui|terminal]")
+                print(f"Using default mode from .env: {mode}")
+        
+        if mode == "terminal":
+            run_terminal()
         else:
-            print(f"Invalid mode argument: {arg_mode}")
-            print("Usage: python3 main.py [gui|terminal]")
-            print(f"Using default mode from .env: {mode}")
-    
-    if mode == "terminal":
-        run_terminal()
-    else:
-        run_gui()
+            run_gui()
+    except Exception as e:
+        print(f"Fatal Error: {str(e)}")
+        print("The application failed to start.")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

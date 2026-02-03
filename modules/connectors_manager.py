@@ -1,7 +1,7 @@
 from modules.prompts_manager import PromptsManager
 from modules.docs_manager import DocsManager
-from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_classic.chains.combine_documents import create_stuff_documents_chain
+from langchain_classic.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 
 class PromptAnalyzerAgent:
@@ -45,10 +45,8 @@ class PromptAnalyzerAgent:
                     print("[DEBUG] Analyzer chose: simple")
                 return "simple"
         except Exception:
-            # fall back to heuristic below
             pass
 
-        # Heuristic fallback
         q = question.lower()
         for kw in self.RAG_KEYWORDS:
             if kw in q:
@@ -75,12 +73,10 @@ class RAGAgent:
         if self.debug:
             print("[DEBUG] Using agent: RAGAgent")
         
-        # If no retriever (no docs loaded), inform user that RAG is unavailable
         if self.retriever is None:
             if self.debug:
                 print("[DEBUG] Warning: No documents loaded, RAG cannot proceed")
             
-            # Return localized message indicating the knowledge base is empty
             if self.config and hasattr(self.config, 'texts'):
                 return self.config.texts.get('rag.no.knowledge.base', "ERROR")
             return "ERROR"
@@ -95,7 +91,6 @@ class SimpleLLMAgent:
         self.debug = debug
 
     def answer(self, question: str):
-        # Use the same chain but without external context for a simple LLM reply
         if self.debug:
             print("[DEBUG] Using agent: SimpleLLMAgent")
         return self.document_chain.invoke({"input": question, "context": ""})
@@ -110,7 +105,6 @@ class ConnectorManager:
         docsMgr = DocsManager(config)
         docs = docsMgr.getDocs()
         
-        # Initialize retriever only if docs are available
         self.retriever = None
         if docs:
             splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=30)
@@ -118,9 +112,8 @@ class ConnectorManager:
             vectorStore = FAISS.from_documents(chunks, self.connector.embeddings)
             self.retriever = vectorStore.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": 0.3, "k": 4})
         
-        # Instantiate multi-agent components
         analyzer_prompt = promptsMgr.get_analyzer_prompt()
-        # Pass debug flag from config into agents so they can optionally print
+
         self.prompt_analyzer = PromptAnalyzerAgent(self.connector.llm, analyzer_prompt, persona=self.config.AI_PERSONA, debug=self.config.DEBUG)
         self.rag_agent = RAGAgent(self.document_chain, self.retriever, debug=self.config.DEBUG, config=self.config)
         self.simple_agent = SimpleLLMAgent(self.document_chain, debug=self.config.DEBUG)
@@ -133,7 +126,6 @@ class ConnectorManager:
             raise ValueError(f"Unsupported LLM type: {self.config.LLM_TYPE}")
 
     def call(self, question):
-        # Decide which agent should handle this question
         decision = self.prompt_analyzer.decide(question)
         if decision == "rag":
             return self.rag_agent.answer(question)

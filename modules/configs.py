@@ -9,7 +9,6 @@ def load_texts(filepath: str) -> dict:
         raise FileNotFoundError(f"Localization file not found: {filepath}")
 
     with open(filepath, "r", encoding="utf-8") as f:
-        # Filter comments and empty lines for safety
         lines = [
             line for line in f
             if line.strip() and not line.strip().startswith(("#", "!"))
@@ -30,9 +29,7 @@ class Config:
     LOCAL_KNOWLEDGE_PATH = os.getenv("LOCAL_KNOWLEDGE_PATH")
     LOCAL_KNOWLEDGE_DOC_TYPES = os.getenv("LOCAL_KNOWLEDGE_DOC_TYPES").split(",")
     EMBEDDINGS_AI_MODEL = os.getenv("EMBEDDINGS_AI_MODEL")
-    # Debug flag: set to true/1/yes to enable agent debug prints
     DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes", "y")
-    # Mode: "gui" for graphical interface or "terminal" for command-line chat
     MODE = os.getenv("MODE", "gui").lower()
     texts = load_texts(f"texts/{LANGUAGE}.properties")
 
