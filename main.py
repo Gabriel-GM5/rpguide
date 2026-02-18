@@ -1,4 +1,4 @@
-import sys
+"import sys
 from modules.configs import Config
 
 def main():
@@ -10,24 +10,24 @@ def main():
         
         if len(sys.argv) > 1:
             arg_mode = sys.argv[1].lower()
-            if arg_mode in ("gui", "terminal"):
+            if arg_mode in (\"gui\", \"terminal\"):
                 mode = arg_mode
             else:
-                print(f"Invalid mode argument: {arg_mode}")
-                print("Usage: python3 main.py [gui|terminal]")
-                print(f"Using default mode from .env: {mode}")
+                print(f\"Invalid mode argument: {arg_mode}\")
+                print(\"Usage: python3 main.py [gui|terminal]\")
+                print(f\"Using default mode from .env: {mode}\")
         
-        if mode == "terminal":
-            from terminal.app import run_terminal
+        if mode == \"terminal\":
+            from modules.terminal_app import run_terminal
             run_terminal()
         else:
-            from gui.app import run_gui
+            from modules.gui_app import run_gui
             run_gui()
     except Exception as e:
-        print(f"Fatal Error: {str(e)}")
-        print("The application failed to start.")
+        print(f\"Fatal Error: {str(e)}\")
+        print(\"The application failed to start.\")
         sys.exit(1)
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == \"__main__\":
+    main()"
