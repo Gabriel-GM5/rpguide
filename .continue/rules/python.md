@@ -1,255 +1,210 @@
-Python Project Rules and Environment Definition
+Python Project Rules
 
 
 PROJECT DECLARATION
 
-This is a Python project.
-
-The application entrypoint is:
-
-main.py
-
-Location:
-Project root directory.
-
-The application must be executed using module mode:
-
-python3 -m main
-
-Do NOT run:
-python main.py
-
-Module execution is mandatory to ensure correct package resolution and import behavior.
+- This is a Python 3 project.
+- Entrypoint: main.py (project root)
+- Execution mode:
+    python3 -m main
+- Never use:
+    python main.py
+- Module execution is mandatory (correct import resolution).
 
 
-CRITICAL RULE — NO LIVE RUNTIME EXECUTION
-
-The agent MUST NOT execute the application interactively.
+ABSOLUTE RULE — NO RUNTIME EXECUTION
 
 The agent MUST NOT run:
 
-python3 -m main
-python3 .\main.py gui
-python3 .\main.py terminal
+- python3 -m main
+- python3 .\main.py gui
+- python3 .\main.py terminal
 
-The application may require user interaction and must NOT be executed automatically.
+No interactive execution.
+No GUI launch.
+No terminal launch.
+No fire tests.
 
-NO live runtime tests.
-NO interactive execution.
-NO fire tests.
-
-Validation must be STATIC ONLY.
+All validation must be STATIC only.
 
 
-ALLOWED VALIDATION METHODS
+ALLOWED VALIDATION
 
 The agent may:
 
-- Perform static code analysis
-- Check imports logically
-- Review syntax
-- Inspect code structure
-- Validate argument parsing logic by inspection
-- Run non-interactive tooling (if confirmed safe)
+- Perform static analysis
+- Review syntax and imports
+- Inspect architecture
+- Validate logic by reasoning
+- Run non-interactive tools (if safe)
 
-The agent must NOT execute any command that launches the application interface.
-
-
-PYTHON VERSION AND EXECUTION
-
-The agent must assume:
-
-- Python 3 environment
-- python3 command is available
-- Virtual environments are expected
-
-Before executing Python-related commands (non-interactive only), the agent may verify:
-
-python3 --version
-
-If dependencies are required, use:
-
-python3 -m pip install <package>
-
-Never assume global pip without module invocation.
+The agent must NOT execute anything that launches the application.
 
 
-VIRTUAL ENVIRONMENT RULE
+PYTHON ENVIRONMENT
 
-The project should use a virtual environment.
+Assume:
+
+- Python 3
+- python3 command available
+- Virtual environments expected
+
+Verify version (if needed):
+    python3 --version
+
+Install packages using:
+    python3 -m pip install <package>
+
+Never use bare pip.
+
+
+VIRTUAL ENVIRONMENT
 
 Preferred creation:
+    python3 -m venv .venv
 
-python3 -m venv .venv
+PowerShell activation:
+    .venv\Scripts\Activate.ps1
 
-Activation (PowerShell):
-
-.venv\Scripts\Activate.ps1
-
-If the virtual environment is not activated, the agent should recommend activation before installing dependencies.
-
-The agent must NOT automatically recreate or delete environments.
+Do not auto-delete or recreate environments.
+Recommend activation if missing.
 
 
-PROJECT STRUCTURE ASSUMPTIONS
+PROJECT STRUCTURE RULES
 
-- main.py is the application entrypoint.
-- Source files should be modular and organized.
-- Avoid placing large logic blocks directly inside main.py.
-- Use functions and modules.
+- main.py is entrypoint.
+- Keep logic modular.
+- Avoid large logic blocks in main.py.
 - Avoid circular imports.
-- Use absolute imports where appropriate.
-
-The agent must not restructure the project without clear intent.
-
-
-IMPORT BEHAVIOR
-
-Because execution uses:
-
-python3 -m main
-
-- Imports must be compatible with module execution.
-- Avoid relying on relative path hacks.
-- Do NOT modify sys.path unless explicitly required and justified.
-- Do NOT use runtime path manipulation as a default solution.
+- Prefer absolute imports.
+- Do not restructure architecture without explicit intent.
 
 
-DEPENDENCY MANAGEMENT
+IMPORT RULES
 
-If dependency management is present, prefer:
+Because execution is:
+    python3 -m main
 
+- Imports must support module execution.
+- Do NOT modify sys.path unless explicitly justified.
+- Do NOT rely on path hacks.
+
+
+DEPENDENCIES
+
+Prefer:
 - requirements.txt
 - pyproject.toml
 
-Install dependencies using:
+Install via:
+    python3 -m pip install -r requirements.txt
 
-python3 -m pip install -r requirements.txt
-
-Do NOT assume poetry or pipenv unless explicitly detected.
-
-Before using any tool, verify its presence.
-
-The agent must not automatically upgrade all dependencies unless explicitly requested.
+Do not assume poetry/pipenv.
+Do not auto-upgrade dependencies.
 
 
-CODE STYLE AND BEST PRACTICES
+CODE QUALITY
 
-The agent must follow modern Python best practices:
+Follow modern Python best practices:
 
-- Use Python 3 syntax only.
-- Use type hints where appropriate.
-- Follow PEP 8 style guidelines.
-- Prefer explicit over implicit.
-- Avoid global mutable state.
-- Keep functions small and focused.
-- Use descriptive variable names.
-- Avoid deeply nested logic.
-- Handle exceptions explicitly.
-- Avoid bare except blocks.
+- Python 3 syntax only
+- Type hints when appropriate
+- PEP 8
+- Small focused functions
+- Explicit error handling
+- No bare except
+- Avoid global mutable state
+- Clear naming
+- Avoid deep nesting
 
 Use:
 
 if __name__ == "__main__":
     main()
 
-Only if main.py internally calls a main() function.
-Otherwise rely on module execution entry.
+Only if main() exists.
 
 
-ERROR HANDLING
+TESTING RULE
 
-- Raise specific exceptions.
-- Do not suppress errors silently.
-- Log meaningful error messages.
-- Avoid swallowing stack traces unless intentionally handled.
+Tests (e.g., pytest) may run ONLY if:
 
+- Non-interactive
+- Do not launch GUI
+- Do not launch terminal
+- Do not require user input
 
-TESTING POLICY
+Run using:
+    python3 -m pytest
 
-If automated tests exist (e.g., pytest), they may be executed ONLY if:
-
-- They are non-interactive.
-- They do not launch GUI or terminal modes.
-- They do not require user input.
-
-Run tests using:
-
-python3 -m pytest
-
-Do NOT create artificial runtime tests.
-Do NOT simulate user interaction.
+Never create artificial runtime tests.
 
 
-FORMATTING AND LINTING
+FORMATTING / LINTING
 
-If formatting tools are present, prefer:
-
+If available:
 - black
 - ruff
 - flake8
 
-Verify existence before use:
+Verify before use:
+    python3 -m black --version
 
-python3 -m black --version
-
-Do not assume availability.
-
-
-FILE PATH RULES (WINDOWS ENVIRONMENT)
-
-- Use Windows-compatible paths.
-- Prefer pathlib over string-based paths.
-- Avoid hardcoding forward slashes.
-- Use pathlib.Path for file manipulation.
-- Ensure proper escaping of backslashes.
+Do not assume tools exist.
 
 
-ASYNC AND CONCURRENCY
+WINDOWS PATH RULES
 
-If async code is used:
-
-- Use asyncio properly.
-- Avoid mixing blocking IO inside async functions.
-- Do not create new event loops unnecessarily.
-- Do not introduce concurrency unless required.
+- Windows-compatible paths only
+- Prefer pathlib
+- Avoid hardcoded slashes
+- Ensure proper escaping
 
 
-SECURITY PRACTICES
+ASYNC RULES
 
-- Never hardcode secrets.
-- Use environment variables via:
-  os.environ
-- Validate external input.
-- Avoid eval or exec unless explicitly required.
-- Avoid insecure deserialization.
+If async exists:
 
-
-PERFORMANCE PRACTICES
-
-- Avoid premature optimization.
-- Avoid unnecessary global caching.
-- Avoid excessive object creation inside tight loops.
-- Prefer built-in libraries over custom implementations when appropriate.
+- Use asyncio correctly
+- Avoid blocking IO inside async
+- Do not create extra event loops
+- Do not introduce concurrency unless required
 
 
-ABSOLUTE RULE
+SECURITY
 
-The agent must treat this as a structured Python application executed via:
+- No hardcoded secrets
+- Use os.environ for config
+- Validate input
+- Avoid eval/exec unless explicitly required
+- Avoid insecure deserialization
 
-python3 -m main
 
-However:
+PERFORMANCE
 
-Execution must NOT be triggered automatically.
+- No premature optimization
+- Avoid unnecessary global caching
+- Avoid excessive object creation
+- Prefer standard library
 
-All validation must be static and non-interactive.
 
-All development decisions must respect:
+FINAL RULE
 
-- Windows environment
-- PowerShell shell rules
-- Python 3 module execution semantics
-- Clean project architecture
-- Maintainable and production-safe Python code
-- No automatic runtime execution
+Treat this as a structured Python application executed via:
+
+    python3 -m main
+
+BUT:
+
+Execution must NEVER be triggered automatically.
+
+All reasoning must be static.
+All changes must preserve architecture.
+All decisions must respect:
+
+- Windows + PowerShell environment
+- Python 3 module semantics
+- Clean architecture
+- Maintainability
+- Production safety
+- Non-interactive validation only

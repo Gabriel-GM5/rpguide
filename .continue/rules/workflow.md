@@ -3,161 +3,180 @@ Task Execution Workflow Policy
 
 PURPOSE
 
-This file defines the mandatory workflow the agent must follow for ANY task, regardless of size or complexity.
+Defines the mandatory workflow for ANY task.
 
 No step may be skipped.
+Order may not be changed.
 
 
 STEP 1 — UNDERSTAND THE TASK
 
-Before writing or modifying any code, the agent must:
+Before modifying code:
 
-- Carefully read the task.
-- Identify the goal.
+- Read the task carefully.
+- Identify goal and expected behavior.
 - Identify constraints.
-- Identify expected output or behavior.
-- Identify whether the task affects:
+- Identify affected areas:
   - GUI mode
   - Terminal mode
   - Shared logic
   - Startup behavior
-  - File system operations
+  - Filesystem
   - Configuration
   - Dependencies
 
-If any part of the task is ambiguous:
+If ambiguity exists:
 STOP.
-Ask for clarification before proceeding.
+Ask for clarification.
 
-The agent must never assume missing requirements.
+Never assume missing requirements.
 
 
 STEP 2 — UNDERSTAND THE PROJECT
 
-Before making changes, the agent must:
+Before changes:
 
-- Inspect the project structure.
-- Identify entrypoint (main.py at project root).
-- Understand how execution flows for:
-  python3 .\main.py gui
-  python3 .\main.py terminal
-- Identify modules impacted by the task.
+- Inspect project structure.
+- Identify entrypoint (main.py at root).
+- Understand execution flow:
+    python3 .\main.py gui
+    python3 .\main.py terminal
+- Identify impacted modules.
 - Identify dependencies between files.
-- Evaluate potential side effects.
+- Evaluate side effects.
+- Determine correct integration boundary.
 
-The agent must determine:
+The agent must know:
 
-- Where the change belongs.
-- Whether existing functionality could be affected.
-- Whether architecture constraints exist.
+- Where change belongs.
+- What existing behavior could be affected.
+- Architectural constraints.
 
-No code modification is allowed before understanding integration impact.
+No modification before integration impact is understood.
 
 
-STEP 3 — IMPLEMENT THE CHANGE
+STEP 3 — IMPLEMENT
 
-Only after Steps 1 and 2 are complete:
+Only after Steps 1–2:
 
-- Implement minimal, precise changes.
+- Apply minimal, precise changes.
 - Avoid unrelated refactoring.
-- Avoid structural modifications unless required.
-- Follow Python best practices.
+- Avoid structural changes unless required.
 - Maintain Windows compatibility.
-- Maintain correct escaping.
-- Maintain startup integrity.
-- Maintain GUI and Terminal mode compatibility.
-
-The agent must:
-
-- Write clean code.
+- Preserve startup integrity.
+- Preserve GUI/Terminal compatibility.
 - Avoid duplicated logic.
-- Avoid introducing unnecessary complexity.
-- Preserve existing behavior unless explicitly instructed otherwise.
+- Avoid unnecessary complexity.
+- Preserve existing behavior unless instructed otherwise.
+
+Code must be clean and production-safe.
 
 
-STEP 4 — TEST
+STEP 4 — TEST (MANDATORY)
 
-After implementation, the agent must validate:
+After implementation, validate:
 
-- Imports resolve correctly.
-- No syntax errors exist.
-- Indentation is correct.
-- Strings are properly escaped.
-- No partial copy-paste artifacts remain.
-- No debug code remains.
+Technical validation:
+- Imports resolve
+- No syntax errors
+- Correct indentation
+- Proper escaping
+- No debug artifacts
+- No partial edits
 
-The agent must ensure the application can still be executed in both modes:
+Execution validation:
+    python3 .\main.py gui
+    python3 .\main.py terminal
 
-python3 .\main.py gui
-python3 .\main.py terminal
+Application integrity must remain intact.
 
-If execution integrity is uncertain:
+Unit testing validation:
+
+- Identify changed files.
+- Determine if logic/behavior changed.
+- Add or update unit tests accordingly.
+- Ensure new behavior is covered.
+- Ensure bug fixes include failing-before tests.
+- Ensure no existing tests break.
+
+Run tests using:
+
+    python3 -m pytest
+
+If available, optional coverage:
+
+    python3 -m pytest --cov
+
+Unit tests must be:
+- Isolated
+- Deterministic
+- Non-interactive
+- Architecture-aware
+
+If execution or tests are uncertain:
 STOP.
-Do not proceed to commit.
+Do not proceed.
 
 
 STEP 5 — REVIEW
 
-Before committing:
+Before commit:
 
 - Review full diff.
 - Confirm only relevant files changed.
-- Confirm no unintended edits occurred.
+- Confirm no unintended edits.
 - Confirm no formatting corruption.
-- Confirm no trailing artifacts.
-- Confirm commit message reflects actual change.
+- Confirm no residual artifacts.
+- Validate logical correctness.
 - Evaluate regression risk.
 - Evaluate startup risk.
-- Evaluate logical correctness.
+- Ensure tests properly reflect changes.
 
-If any risk is unclear:
+If risk or uncertainty exists:
 STOP.
 Ask for clarification.
 
 
 STEP 6 — COMMIT
 
-Only after successful:
+Only after:
 
-- Task understanding
-- Project understanding
-- Implementation
-- Testing
-- Review
+1. Task understood
+2. Project impact understood
+3. Implementation complete
+4. Testing (including unit tests) passed
+5. Review complete
 
-The agent may commit.
+Commit rules:
 
-Commit must:
-
-- Be created on a proper branch (never protected branches).
-- Include [AI Generated] tag.
-- Accurately describe the change.
-- Reflect actual diff content.
+- Use proper branch (never protected branches).
+- Include tag: [AI Generated]
+- Message must accurately describe change.
+- Must reflect actual diff.
 
 
-MANDATORY EXECUTION ORDER
+MANDATORY ORDER
 
-The workflow order is strictly:
+Strict sequence:
 
-1. Understand the task
-2. Understand the project and integration impact
+1. Understand task
+2. Understand project
 3. Implement
-4. Test
+4. Test (includes unit testing)
 5. Review
 6. Commit
 
-Reordering is not allowed.
-
-Skipping steps is not allowed.
+Reordering is forbidden.
+Skipping is forbidden.
 
 
 FAIL-SAFE RULE
 
-If at any stage uncertainty appears:
+If uncertainty appears at any stage:
 
 - Do not guess.
 - Do not partially commit.
-- Do not push unstable changes.
+- Do not push unstable code.
 
 Instead:
 Ask the user.

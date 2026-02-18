@@ -1,184 +1,153 @@
-Terminal and Environment Rules for AI Agent
+Terminal & Environment Rules
 
 
-ENVIRONMENT DECLARATION (MANDATORY)
+ENVIRONMENT
 
-The agent is operating in a Windows environment.
-
-The default and required shell is:
-PowerShell
-
-All commands must follow:
-
-- PowerShell syntax
-- PowerShell semantics
-- Windows command behavior
-- Windows filesystem conventions
+- OS: Windows
+- Default shell: PowerShell
+- All commands must follow:
+  - PowerShell syntax
+  - Windows filesystem conventions
+  - Windows command behavior
 
 
-PRIMARY EXECUTION RULE
+PRIMARY RULE
 
-PowerShell is the first and mandatory choice.
-
-The agent must always attempt to solve the problem using:
+Always use:
 
 - Native PowerShell
 - Native Windows tools
-- Native Git for Windows
-- CMD-compatible commands when appropriate
+- Git for Windows
+- CMD-compatible commands (if appropriate)
 
-Linux-based environments must NOT be used by default.
+Do NOT default to Linux tools.
 
 
-LIMITED USE OF GIT BASH AND WSL
+GIT BASH / WSL (LAST RESORT)
 
-Git Bash and WSL are available, but:
+Git Bash and WSL:
 
-- They are LAST RESORT tools.
-- They must ONLY be used when the task is impossible or unsafe in PowerShell or CMD.
-- The agent MUST ask for explicit user permission before using them.
+- Are emergency tools only
+- Must be used ONLY if impossible in PowerShell/CMD
+- Require explicit user permission before use
 
-The agent must clearly explain:
+Before requesting permission, explain:
 
-- Why PowerShell cannot accomplish the task.
-- Why Git Bash or WSL is required.
-- What will be executed inside that environment.
+- Why PowerShell cannot solve the task
+- Why Bash/WSL is required
+- What will be executed
 
-Without explicit approval, the agent must NOT use:
-
+Without approval, NEVER use:
 - bash
 - wsl
-- Linux shell commands
+- Linux commands
 - Unix-only tooling
 
 
 FORBIDDEN ASSUMPTIONS
 
-The agent must NOT assume:
+Do NOT assume:
 
-- Linux filesystem structure
-- Root path "/"
+- Linux filesystem (/)
 - Bash syntax
-- GNU coreutils availability
-- Unix-style piping behavior
-- That WSL is running or configured
-- That Git Bash is the default shell
+- GNU coreutils
+- Unix piping semantics
+- WSL is running
+- Git Bash is default shell
 
 Do NOT default to:
+ls, grep, sed, awk, chmod, sudo, export, rm, mv, cp, touch
 
-- ls
-- grep
-- sed
-- awk
-- chmod
-- sudo
-- export
-- rm
-- mv
-- cp
-- touch
-
-Unless explicitly running inside approved Git Bash or WSL.
+Unless explicitly inside approved Bash/WSL.
 
 
-POWERSHELL COMMAND REQUIREMENT
+POWERSHELL EQUIVALENTS
 
-Use PowerShell equivalents:
+Directory:
+  Get-ChildItem
 
-Directory listing:
-Get-ChildItem
+Read file:
+  Get-Content
 
-File content:
-Get-Content
+Search:
+  Select-String
 
-Search in files:
-Select-String
+Temp env var:
+  $env:NAME = "value"
 
-Temporary environment variable:
-$env:VARIABLE_NAME = "value"
-
-Persistent environment variable:
-setx VARIABLE_NAME "value"
+Persistent env var:
+  setx NAME "value"
 
 Remove file:
-Remove-Item
+  Remove-Item
 
 Move file:
-Move-Item
+  Move-Item
 
 Copy file:
-Copy-Item
+  Copy-Item
 
 Create file:
-New-Item
+  New-Item
 
-Delete directory:
-Remove-Item -Recurse -Force
+Remove directory:
+  Remove-Item -Recurse -Force
 
-Check command existence:
-Get-Command <name>
+Check command:
+  Get-Command <name>
 
 Current directory:
-Get-Location
+  Get-Location
 
-Path join:
-Join-Path
+Join path:
+  Join-Path
 
 
 PATH RULES
 
-- Use Windows path format.
-- Example: C:\Users\gabri\Project
-- Do NOT assume forward-slash root paths.
-- Prefer Join-Path for dynamic paths.
+- Use Windows paths (C:\...)
+- Do not assume forward-slash root
+- Prefer Join-Path for dynamic paths
 
 
-COMMAND CHAINING RULES
+COMMAND CHAINING
 
-In PowerShell:
-
-- Use semicolon ; to separate commands.
-- Use proper if statements for conditional logic.
-- Do NOT rely on bash-style && or || semantics.
+- Use ; to separate commands
+- Use proper PowerShell if syntax
+- Do NOT rely on bash && or ||
 
 Example:
-
 if (Test-Path "file.txt") { Remove-Item "file.txt" }
 
 
-SCRIPTING RULES
+SCRIPTING
 
-When writing scripts:
-
-- Use .ps1 format.
-- Use PowerShell variable syntax with $.
-- Respect execution policies.
-- Avoid bash syntax.
+- Use .ps1 format
+- Use $variable syntax
+- Respect execution policy
+- No bash syntax
 
 
-GIT EXECUTION CONTEXT
+GIT CONTEXT
 
-Git commands must be written in PowerShell-compatible syntax.
+- Git commands must be PowerShell-compatible
+- Ensure Windows-safe paths
+- Do not assume Unix quoting behavior
 
-Do not assume Unix quoting behavior.
-Ensure paths are Windows-compatible.
 
+TOOL VERIFICATION
 
-TOOL VERIFICATION RULE
+Before using non-native tools:
 
-Before using any non-native tool, the agent must verify its existence:
-
-Get-Command <tool-name>
+  Get-Command <tool>
 
 If unavailable:
-STOP.
-Inform the user.
+STOP and inform user.
 
 
 ABSOLUTE RULE
 
-The agent must prioritize native Windows and PowerShell solutions.
+PowerShell is mandatory.
+Windows-native solutions first.
 
-Git Bash and WSL are emergency tools only.
-
-Explicit permission is required before using them.
+Git Bash and WSL are emergency-only and require explicit approval.

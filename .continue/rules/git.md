@@ -1,157 +1,134 @@
 Git Usage Rules for AI Agent
 
 
-PROTECTED BRANCH POLICY (ABSOLUTE RULE)
+PROTECTED BRANCHES (ABSOLUTE)
 
-The following branches are PROTECTED:
+Protected:
+- main
+- master
+- production
 
-main
-master
-production
+The agent MUST NEVER:
+- Commit to them
+- Modify files while on them
+- Delete them
+- Force push
+- Reset / rebase / rewrite history
+- Merge into them
 
-The agent must NEVER:
+Only a human may modify protected branches.
 
-- Commit directly to a protected branch.
-- Modify files while currently on a protected branch.
-- Delete a protected branch.
-- Force push to a protected branch.
-- Reset, rebase, or rewrite history of a protected branch.
-- Merge into a protected branch.
-
-Protected branches must only be modified by explicit human action.
+Direct commit to main is allowed ONLY if user explicitly says:
+"Commit directly to main"
 
 
-WORKING BRANCH REQUIREMENT (MANDATORY)
+WORKING BRANCH RULE (MANDATORY)
 
-When the user requests any change:
+On any requested change:
 
-- Run:
-  git branch --show-current
+1. Run:
+   git branch --show-current
 
-- If currently on main, master, or production:
-  - Create a new branch.
-  - Switch to that branch.
-  - Perform all work there.
+2. If on a protected branch:
+   - Create new branch
+   - Switch to it
+   - Work only there
 
-The agent may only commit directly to main if the user explicitly says:
-Commit directly to main
-
-Without explicit authorization, the agent must refuse.
+Refuse if user does not allow branch creation.
 
 
 BRANCH NAMING
 
-Use one of the following formats:
+Use:
+- feature/<name>
+- fix/<name>
+- refactor/<name>
+- chore/<name>
 
-feature/<short-description>
-fix/<short-description>
-refactor/<short-description>
-chore/<short-description>
-
-Branch names must:
-- Be lowercase
-- Use hyphens
-- Be concise and descriptive
+Rules:
+- lowercase
+- hyphen-separated
+- concise
 
 
-COMMIT MESSAGE POLICY (MANDATORY)
+COMMIT MESSAGE (MANDATORY)
 
-Every commit MUST:
+Every commit must:
 
-- Be written by the agent.
+- Be written by the agent
 - Start with: [AI Generated]
 
 Format:
-
 [AI Generated] <type>: <clear description>
 
-The commit message must accurately describe the staged changes.
-The agent must NEVER blindly reuse user text as the commit message.
+Message must reflect actual staged diff.
+Never reuse raw user text blindly.
 
 
-PRE-COMMIT VERIFICATION (STRICT)
+PRE-STAGING CHECK (STRICT)
 
-Before staging any files, the agent MUST:
+Before staging:
 
-1. Run:
-   git status --porcelain
+Run:
+  git status --porcelain
 
-2. Identify:
-   - Modified files
-   - Deleted files
-   - Renamed files
-   - Staged files
-   - Untracked files (lines starting with ??)
+Review ALL:
+- Modified
+- Deleted
+- Renamed
+- Staged
+- Untracked (??)
 
-3. Evaluate every file individually.
-
-4. Determine which files are directly related to the task.
+Evaluate each file individually.
 
 
-UNTRACKED FILE POLICY
+UNTRACKED FILES
 
-- All untracked files must be reviewed.
-- The agent must determine whether each untracked file is required for the task.
-- If an untracked file is unrelated, it must NOT be staged.
-- If unsure about any file:
-  STOP and ask the user.
+- Review all untracked files.
+- Stage only if directly related to task.
+- If unsure: STOP and ask.
 
 
-STAGING DECISION RULE (INTELLIGENT STAGING)
+STAGING STRATEGY (INTELLIGENT)
 
-After analysis, the agent must choose the safest and most appropriate staging strategy.
-
-Use:
-  git add <specific-file>
-
-WHEN:
-- Only a subset of files are related to the task.
-- Some files in the working directory are unrelated.
-- There are temporary, log, or unrelated files present.
-- Selective staging reduces risk.
+Prefer:
+  git add <file>
 
 Use:
   git add .
 
-ONLY WHEN ALL of the following are true:
-
-- All modified and untracked files are directly related to the task.
-- No unrelated files exist.
-- No secrets, environment files, logs, or temporary files are present.
-- The working directory is fully intentional and clean.
-- Using git add . is logically safer and simpler than staging individually.
+ONLY IF ALL are true:
+- All changes relate to task
+- No unrelated files
+- No secrets / env / logs
+- Working directory is clean
+- Bulk staging is safer
 
 Blind bulk staging is forbidden.
 
 
-POST-STAGING VERIFICATION
+POST-STAGING CHECK (MANDATORY)
 
-After staging, the agent MUST run:
+Run:
+  git diff --staged
 
-git diff --staged
+Confirm:
+- Only intended files staged
+- Diff matches task
+- No unrelated changes
+- Commit message matches diff
 
-The agent must confirm:
-
-- Only intended files are staged.
-- Changes match the requested task.
-- No unrelated content is included.
-- The commit message accurately reflects the staged changes.
-
-If anything unexpected appears:
+If anything unexpected:
 STOP.
-Do NOT commit.
-Inform the user.
+Do not commit.
 
 
 FORBIDDEN ACTIONS
 
-The agent must NOT:
-
-- Delete protected branches.
-- Modify protected branches directly.
-- Bypass branch creation.
-- Use vague commit messages.
-- Force push.
-- Rebase without explicit instruction.
-- Auto-merge branches.
-- Push without explicit instruction.
+- Modify protected branches
+- Skip branch creation
+- Force push
+- Rebase without explicit instruction
+- Auto-merge
+- Push without explicit instruction
+- Use vague commit messages
