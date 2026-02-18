@@ -48,15 +48,69 @@ See `.env.example` for a complete template.
 
 ## Running the Application
 
-Start the application:
+Start the application in GUI mode (default):
 
 ```bash
 python3 main.py
 ```
 
-The application will run in the mode specified by the `MODE` environment variable:
+Or start the application in terminal mode explicitly:
 
-- **GUI Mode** (`MODE=gui`): Opens a modern chat window with conversation history.
-- **Terminal Mode** (`MODE=terminal`): Runs a command-line chat interface in the terminal.
+```bash
+python3 main.py terminal
+```
 
-Type your questions and press Enter. Type the exit command (configured in your language settings) to exit the application.
+The application will run in the mode specified by the `MODE` environment variable or command-line argument. When running with no arguments, it defaults to GUI mode. When using the `terminal` argument, it runs in command-line mode instead of GUI mode.
+
+### Application Structure
+
+The application is now structured into separate modules for better organization:
+- `gui/app.py`: Contains all GUI-related logic and the ChatApp class
+- `terminal/app.py`: Contains all terminal-based chat logic
+- `main.py`: Main entry point that determines which interface to launch based on configuration or command-line arguments
+
+## Project Structure
+
+```
+.
+├── .env.example          # Example environment file
+├── .git/                 # Git repository
+├── .gitattributes
+├── .gitignore
+├── docs/                 # Documentation files
+├── gui/                  # GUI application modules
+│   ├── __init__.py
+│   └── app.py            # GUI logic and ChatApp class
+├── LICENSE.md            # MIT License
+├── main.py               # Main entry point
+├── modules/              # Core modules
+│   ├── configs.py        # Configuration management
+│   ├── connectors/
+│   ├── connectors_manager.py
+│   ├── docs_manager.py
+│   └── prompts/
+│       └── prompts_manager.py
+├── README.md             # This file
+├── requirements.txt      # Python dependencies
+└── terminal/             # Terminal application modules
+    ├── __init__.py
+    └── app.py            # Terminal logic
+```
+
+## Dependencies
+
+The project requires the following Python packages (as listed in `requirements.txt`):
+
+- langchain_classic==1.0.1
+- langchain_community==0.4.1
+- langchain_core==1.2.8
+- langchain_google_genai==4.2.0
+- langchain_unstructured==1.0.1
+- python-dotenv==1.2.1
+- ttkbootstrap==1.20.1
+- PyMuPDF==1.26.7
+- faiss-cpu==1.13.2
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE.md file for details.
