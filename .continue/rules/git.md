@@ -117,6 +117,7 @@ Confirm:
 - Diff matches task
 - No unrelated changes
 - Commit message matches diff
+- Correct branch is selected
 
 If anything unexpected:
 STOP.
@@ -132,3 +133,4 @@ FORBIDDEN ACTIONS
 - Auto-merge
 - Push without explicit instruction
 - Use vague commit messages
+- Commiting without ensuring you're in the correct branch
