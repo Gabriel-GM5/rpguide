@@ -22,23 +22,23 @@ def test_main_mode_selection():
     try:
         # Test with no arguments (should default to gui)
         with patch('sys.argv', ['main.py']):
-        with patch('modules.configs.Config') as mock_config_class:
-            mock_config = MagicMock()
-            mock_config.MODE = "gui"  # Default from .env
-            mock_config_class.return_value = mock_config
-            
-            # Mock the run functions to avoid actual execution
-            with patch('modules.terminal_app.run_terminal') as mock_terminal, \
-                 patch('modules.gui_app.run_gui') as mock_gui:
+            with patch('modules.configs.Config') as mock_config_class:
+                mock_config = MagicMock()
+                mock_config.MODE = "gui"  # Default from .env
+                mock_config_class.return_value = mock_config
                 
-                # Import and call main function
-                from main import main
-                
-                # This should not raise exceptions
-                try:
-                    main()
-                except SystemExit:
-                    pass  # Expected on error
+                # Mock the run functions to avoid actual execution
+                with patch('modules.terminal_app.run_terminal') as mock_terminal, \
+                     patch('modules.gui_app.run_gui') as mock_gui:
+                    
+                    # Import and call main function
+                    from main import main
+                    
+                    # This should not raise exceptions
+                    try:
+                        main()
+                    except SystemExit:
+                        pass  # Expected on error
 
                     # Verify that appropriate function was called based on mode
                     # Since default is gui, run_gui should be called

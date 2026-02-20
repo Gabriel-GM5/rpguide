@@ -130,7 +130,7 @@ Before commit:
 - Validate logical correctness.
 - Evaluate regression risk.
 - Evaluate startup risk.
-- Ensure tests properly reflect changes.
+- Ensure tests properly reflect changes and there are no test errors.
 
 If risk or uncertainty exists:
 STOP.

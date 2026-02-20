@@ -182,7 +182,7 @@ def test_connector_manager_init():
     mock_config.DEBUG = False
     
     # Mock the getConnector method to return a mock connector
-    with patch('modules.connectors_manager.GeminiConnector') as mock_connector_class:
+    with patch('modules.connectors.gemini_connector.GeminiConnector') as mock_connector_class:
         mock_connector = MagicMock()
         mock_connector_class.return_value = mock_connector
         
