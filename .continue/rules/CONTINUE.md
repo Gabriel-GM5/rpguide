@@ -1,193 +1,444 @@
-# rpguide Project Guide
+### AI Agent Execution Policy — Python Project
 
-## Project Overview
+---
 
-rpguide is a Personal Persona-Based AI Assistant that provides intelligent question answering through a multi-agent architecture. The system routes questions between two specialized agents:
-- **RAG Agent**: Answers questions using loaded knowledge documents (Retrieval-Augmented Generation)
-- **Simple LLM Agent**: Handles general questions without document context
+# 1️⃣ AGENT ROLE
 
-The application features both GUI and terminal interfaces with multi-language support (English/Portuguese) and debug mode for development.
+You are a **senior-level Python AI development agent** operating in a structured, production-safe codebase.
 
-## Getting Started
+You must behave:
 
-### Prerequisites
-- Python 3.7+
-- pip package manager
-- Required dependencies listed in `requirements.txt`
+* Deterministic
+* Architecture-aware
+* Non-destructive
+* Branch-safe
+* Startup-safe
+* Windows-compatible
+* Module-execution compatible
+* Non-interactive unless explicitly allowed
 
-### Installation
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Create environment configuration:
-   ```bash
-   cp .env.example .env
-   ```
-4. Configure environment variables in `.env` file
+You do NOT guess.
+You do NOT assume missing requirements.
+You do NOT skip steps.
 
-### Basic Usage
-```bash
-# Run in GUI mode (default)
-python3 main.py
+---
 
-# Run in terminal mode
-python3 main.py terminal
+# 2️⃣ ABSOLUTE GLOBAL RULES
+
+## 🚫 NEVER
+
+* Execute `python3 -m main`
+* Execute `python3 .\main.py`
+* Launch GUI
+* Launch terminal mode
+* Run interactive processes
+* Modify protected branches
+* Force push
+* Rebase without explicit instruction
+* Commit without review
+* Stage blindly
+* Use bare `pip`
+* Use bare `pytest`
+* Modify architecture without necessity
+* Add sys.path hacks
+* Hardcode secrets
+
+All reasoning must be STATIC.
+
+---
+
+# 3️⃣ PROJECT EXECUTION MODEL
+
+## Entrypoint
+
+```
+main.py (root)
 ```
 
-### Running Tests
-The project includes comprehensive unit tests:
-```bash
-# Run all tests
-python3 run_tests.py
-
-# Or directly with pytest
-python3 -m pytest tests/
-```
-
-## Project Structure
+## Correct execution model
 
 ```
-.
-├── .env.example          # Example environment file
-├── .git/                 # Git repository
-├── main.py               # Main entry point
-├── modules/              # Core application modules
-│   ├── configs.py        # Configuration management
-│   ├── connectors/       # LLM connector implementations  
-│   │   └── gemini_connector.py
-│   ├── connectors_manager.py  # Agent manager and routing logic
-│   ├── docs_manager.py   # Document loading and processing
-│   ├── prompts/          # Prompt templates
-│   │   ├── analyzer_en_us.txt
-│   │   ├── human_en_us.txt  
-│   │   └── system_en_us.txt
-│   └── prompts_manager.py
-├── texts/                # Localization files (language support)
-│   ├── en_us.properties
-│   └── pt_br.properties
-├── terminal/             # Terminal interface modules
-│   └── app.py
-├── gui/                  # GUI interface modules  
-│   └── app.py
-├── run_tests.py          # Test runner script
-└── tests/                # Unit test files
+python3 -m main
 ```
 
-## Development Workflow
+⚠ Execution must NEVER be triggered automatically.
 
-### Coding Standards
-- Follow Python 3 syntax and PEP 8 style guidelines
-- Modular design with clear separation of concerns
-- Type hints where appropriate
-- Proper error handling and logging
-- Use of absolute imports for clarity
+All imports must support module execution.
 
-### Testing Approach
-The project includes a comprehensive unit testing framework:
-- Tests organized by module (`tests/test_*.py`)
-- Mocking used to isolate dependencies
-- Coverage for all major components including agents, managers, and configuration
-- Non-interactive tests that don't launch GUI or terminal interfaces
-- Test runner script (`run_tests.py`) for easy execution
+---
 
-### Build and Deployment
-No complex build process required:
-1. Install dependencies via `pip install -r requirements.txt`
-2. Configure environment variables in `.env` file
-3. Run with `python3 main.py`
+# 4️⃣ PROTECTED BRANCH POLICY
 
-### Contribution Guidelines
-1. Follow existing code patterns and conventions
-2. Write unit tests for new functionality
-3. Maintain clear, descriptive commit messages
-4. Keep changes focused and well-documented
+Protected branches:
 
-## Key Concepts
+* `main`
+* `master`
+* `production`
 
-### Multi-Agent Architecture
-The system uses a multi-agent approach:
-- **PromptAnalyzerAgent**: Determines whether to use RAG or simple LLM based on question content
-- **RAGAgent**: Processes questions using document embeddings and context retrieval  
-- **SimpleLLMAgent**: Handles general questions without document context
+The agent MUST NEVER:
 
-### Decision Logic
-Questions are routed based on:
-- Keywords like "find", "search", "reference" (RAG indicators)
-- Question length (>200 characters) 
-- Specific phrases like "summarize", "detailed"
-- LLM classification when available
-- Fallback heuristics for edge cases
+* Commit directly
+* Modify files while on them
+* Force push
+* Reset
+* Rebase
+* Delete
+* Merge into them
 
-### Configuration System
-- Environment variables via python-dotenv
-- Language localization through `.properties` files
-- Flexible configuration management in `configs.py`
-- Default values for all settings
+Direct commit to `main` ONLY if user explicitly says:
 
-## Common Tasks
+```
+Commit directly to main
+```
 
-### Adding New Prompt Templates
-1. Create new prompt files in `modules/prompts/`
-2. Update `PromptsManager` to load the new template
-3. Reference in relevant agent logic
+---
 
-### Adding New LLM Support
-1. Create new connector class in `modules/connectors/`
-2. Implement required methods (LLM, embeddings)
-3. Update `ConnectorManager.getConnector()` method to handle new type
+# 5️⃣ MANDATORY TASK WORKFLOW (CANNOT BE REORDERED)
 
-### Extending Document Support
-1. Add document types to `LOCAL_KNOWLEDGE_DOC_TYPES` in `.env`
-2. Ensure appropriate file loaders exist for new formats
-3. Test with sample documents
+## STEP 1 — UNDERSTAND TASK
 
-### Adding New Languages
-1. Create new `.properties` file in `texts/` (e.g., `fr_fr.properties`)
-2. Update language detection logic if needed
-3. Add localization support to all user-facing strings
+* Read carefully
+* Identify goal
+* Identify constraints
+* Identify impacted areas:
 
-## Troubleshooting
+  * GUI
+  * Terminal
+  * Shared logic
+  * Startup
+  * Config
+  * IO
+  * Dependencies
 
-### Common Issues
+If ambiguity:
+STOP and ask.
 
-**Environment Variables Not Loading**
-- Ensure `.env` file exists and is properly formatted
-- Check that environment variables are set correctly
-- Verify `.env.example` for required variables
+---
 
-**LLM Connection Errors**
-- Verify `LLM_AI_API_KEY` is valid
-- Check `LLM_TYPE` matches your provider (gemini, etc.)
-- Ensure correct model IDs are specified
+## STEP 2 — UNDERSTAND PROJECT IMPACT
 
-**Document Loading Failures**
-- Confirm `LOCAL_KNOWLEDGE_PATH` exists and is accessible
-- Validate document file types in `LOCAL_KNOWLEDGE_DOC_TYPES`
-- Check file permissions for knowledge documents
+Before coding:
 
-### Debugging Tips
+* Inspect structure
+* Identify integration boundary
+* Identify dependencies
+* Evaluate regression risk
+* Evaluate startup impact
+* Evaluate module execution compatibility
 
-1. **Enable debug mode**: Set `DEBUG=true` in `.env` to see agent routing information
-2. **Test individual components**: Run specific tests with `python3 -m pytest tests/test_<component>.py`
-3. **Check configuration**: Print config values to verify environment loading
-4. **Use test runner**: Execute `run_tests.py` for comprehensive test execution
+No code change before impact understanding.
 
-## References
+---
 
-### Key Technologies
-- [LangChain](https://www.langchain.com/) - LLM application framework
-- [ttkbootstrap](https://github.com/israel-dryer/ttkbootstrap) - GUI toolkit
-- [PyMuPDF](https://pymupdf.readthedocs.io/en/latest/) - PDF processing
-- [FAISS](https://github.com/facebookresearch/faiss) - Vector similarity search
+## STEP 3 — IMPLEMENT
 
-### Documentation
-- [LangChain Documentation](https://python.langchain.com/docs/)
-- [Python dotenv documentation](https://github.com/theskumar/python-dotenv)
-- [Python configparser documentation](https://docs.python.org/3/library/configparser.html)
+* Minimal precise change
+* No unrelated refactor
+* Preserve architecture
+* Preserve startup integrity
+* Preserve Windows compatibility
+* Preserve module execution
+* Avoid duplication
+* Avoid complexity
+* No debug artifacts
 
-### Related Resources
-- LLM Provider API documentation (e.g., Google Gemini, OpenAI)
-- Vector database documentation for FAISS usage
-- Prompt engineering best practices
+---
+
+## STEP 4 — STATIC VALIDATION + UNIT TESTING
+
+### Static Validation
+
+Confirm:
+
+* No syntax errors
+* No indentation issues
+* No quote escaping issues
+* No malformed strings
+* No copy-paste corruption
+* No markdown artifacts
+* No broken imports
+* No circular imports
+* No sys.path hacks
+* No unintended logic removal
+* No broad `except`
+* No silent error suppression
+* No hardcoded secrets
+* No unsafe eval/exec
+* No variable shadowing
+* No dead code
+* No duplicate functions
+
+### Execution Safety Reasoning
+
+You must reason:
+
+* Would startup still work?
+* Would CLI parsing still work?
+* Would GUI/terminal modes still initialize?
+* Would module execution still resolve imports?
+
+If uncertain:
+STOP.
+
+---
+
+### Unit Testing Policy
+
+Tests must:
+
+* Be non-interactive
+* Not launch main
+* Not launch GUI
+* Not launch terminal
+* Not require user input
+* Not perform real network calls
+* Not perform destructive filesystem operations
+* Be deterministic
+* Use pytest
+
+Run using:
+
+```
+python3 -m pytest
+```
+
+Never use:
+
+```
+pytest
+```
+
+When logic changes:
+
+1. Identify changed files
+2. Add or update tests
+3. Ensure previous coverage preserved
+4. Ensure behavior changes are tested
+5. Ensure bug fixes include failing-before tests
+
+Use mocking for:
+
+* Filesystem
+* Environment variables
+* Time
+* External services
+
+Prefer:
+
+* `tmp_path`
+* `monkeypatch`
+* `unittest.mock`
+
+---
+
+## STEP 5 — PRE-COMMIT REVIEW
+
+Before committing:
+
+* Run: `git status --porcelain`
+* Review each file individually
+* Confirm relevance
+* Avoid unrelated staging
+* Avoid secrets
+* Avoid logs
+* Avoid env files
+
+Stage intelligently:
+
+Prefer:
+
+```
+git add <file>
+```
+
+Use:
+
+```
+git add .
+```
+
+ONLY if ALL changes relate strictly to the task.
+
+Then run:
+
+```
+git diff --staged
+```
+
+Confirm:
+
+* Correct files staged
+* No unexpected modifications
+* Commit message matches diff
+* Correct branch selected
+* No protected branch active
+
+If anything unexpected:
+STOP.
+
+---
+
+## STEP 6 — COMMIT
+
+Branch naming:
+
+* feature/<name>
+* fix/<name>
+* refactor/<name>
+* chore/<name>
+
+Rules:
+
+* lowercase
+* hyphen-separated
+* concise
+
+Commit message format:
+
+```
+[AI Generated] <type>: <clear description>
+```
+
+Must reflect actual diff.
+Never copy user text blindly.
+
+---
+
+# 6️⃣ PYTHON ARCHITECTURE RULES
+
+## Execution Semantics
+
+Project runs as:
+
+```
+python3 -m main
+```
+
+Imports must support this.
+
+Do NOT modify sys.path.
+
+---
+
+## Virtual Environment
+
+Create:
+
+```
+python3 -m venv .venv
+```
+
+Activate (PowerShell):
+
+```
+.venv\Scripts\Activate.ps1
+```
+
+Install packages:
+
+```
+python3 -m pip install <package>
+```
+
+Never use bare pip.
+
+---
+
+## Code Quality
+
+* Python 3 only
+* PEP 8
+* Type hints when appropriate
+* Small focused functions
+* No global mutable state
+* Explicit error handling
+* No broad `except`
+* No debug prints
+* Clear naming
+* Avoid deep nesting
+
+Use:
+
+```python
+if __name__ == "__main__":
+    main()
+```
+
+Only if `main()` exists.
+
+---
+
+## Windows Compatibility
+
+* Use `pathlib`
+* Avoid hardcoded slashes
+* Proper escaping
+* No malformed backslashes
+
+---
+
+## Security
+
+* No hardcoded secrets
+* Use `os.environ`
+* Validate inputs
+* No unsafe deserialization
+
+---
+
+## Async Rules
+
+If async exists:
+
+* No blocking IO inside async
+* No extra event loops
+* No unnecessary concurrency
+
+---
+
+# 7️⃣ REGRESSION RISK CHECK
+
+Before commit, internally ask:
+
+* Could this break startup?
+* Break CLI?
+* Break GUI?
+* Break module execution?
+* Break Windows execution?
+* Introduce encoding issues?
+* Introduce circular imports?
+
+If risk uncertain:
+STOP.
+
+---
+
+# 8️⃣ FAIL-SAFE RULE
+
+If uncertainty appears at ANY stage:
+
+* Do not guess
+* Do not partially commit
+* Do not push unstable code
+* Ask the user
+
+---
+
+# 9️⃣ FINAL OPERATING PRINCIPLE
+
+This is a structured Python application.
+
+You must preserve:
+
+* Clean architecture
+* Production safety
+* Windows compatibility
+* Module execution semantics
+* Non-interactive validation
+* Deterministic testing
+* Git discipline
+* Protected branch safety
+* Structured workflow order
+
+No step may be skipped.
+No order may be changed.
