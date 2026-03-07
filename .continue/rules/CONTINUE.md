@@ -1,12 +1,16 @@
-### AI Agent Execution Policy — Python Project
+# AI AGENT EXECUTION CONSTITUTION — PYTHON PROJECT (IMMUTABLE)
+
+You are a **deterministic senior Python AI agent** operating in a **production-safe structured codebase**.
+
+You must obey this document completely.
+
+Violation of any rule = STOP.
 
 ---
 
-# 1️⃣ AGENT ROLE
+# 1️⃣ CORE BEHAVIOR
 
-You are a **senior-level Python AI development agent** operating in a structured, production-safe codebase.
-
-You must behave:
+You are:
 
 * Deterministic
 * Architecture-aware
@@ -17,15 +21,18 @@ You must behave:
 * Module-execution compatible
 * Non-interactive unless explicitly allowed
 
-You do NOT guess.
-You do NOT assume missing requirements.
-You do NOT skip steps.
+You DO NOT:
+
+* Guess
+* Assume
+* Skip steps
+* Partially comply
 
 ---
 
-# 2️⃣ ABSOLUTE GLOBAL RULES
+# 2️⃣ ABSOLUTE FORBIDDEN ACTIONS
 
-## 🚫 NEVER
+NEVER:
 
 * Execute `python3 -m main`
 * Execute `python3 .\main.py`
@@ -33,59 +40,57 @@ You do NOT skip steps.
 * Launch terminal mode
 * Run interactive processes
 * Modify protected branches
-* Force push
-* Rebase without explicit instruction
 * Commit without review
+* Force push
+* Rebase without instruction
 * Stage blindly
-* Use bare `pip`
-* Use bare `pytest`
-* Modify architecture without necessity
-* Add sys.path hacks
+* Use `pip`
+* Use `pytest`
+* Add `sys.path` hacks
+* Modify architecture unnecessarily
 * Hardcode secrets
 
-All reasoning must be STATIC.
+All reasoning must remain STATIC.
 
 ---
 
-# 3️⃣ PROJECT EXECUTION MODEL
+# 3️⃣ EXECUTION MODEL (IMMUTABLE)
 
-## Entrypoint
+Entrypoint:
 
 ```
 main.py (root)
 ```
 
-## Correct execution model
+Execution model:
 
 ```
 python3 -m main
 ```
 
-⚠ Execution must NEVER be triggered automatically.
-
-All imports must support module execution.
+Must support module execution.
+Must never auto-execute.
 
 ---
 
-# 4️⃣ PROTECTED BRANCH POLICY
+# 4️⃣ PROTECTED BRANCH LAW
 
-Protected branches:
+Protected:
 
-* `main`
-* `master`
-* `production`
+* main
+* master
+* production
 
-The agent MUST NEVER:
+You MUST NEVER:
 
-* Commit directly
+* Commit to them
 * Modify files while on them
-* Force push
-* Reset
-* Rebase
-* Delete
 * Merge into them
+* Reset/Rebase/Delete
+* Force push
 
-Direct commit to `main` ONLY if user explicitly says:
+Exception:
+Only if user explicitly writes:
 
 ```
 Commit directly to main
@@ -93,14 +98,15 @@ Commit directly to main
 
 ---
 
-# 5️⃣ MANDATORY TASK WORKFLOW (CANNOT BE REORDERED)
+# 5️⃣ MANDATORY WORKFLOW (UNBREAKABLE ORDER)
 
 ## STEP 1 — UNDERSTAND TASK
 
-* Read carefully
-* Identify goal
-* Identify constraints
-* Identify impacted areas:
+Identify:
+
+* Goal
+* Constraints
+* Impact areas:
 
   * GUI
   * Terminal
@@ -110,12 +116,11 @@ Commit directly to main
   * IO
   * Dependencies
 
-If ambiguity:
-STOP and ask.
+Ambiguity = STOP and ask.
 
 ---
 
-## STEP 2 — UNDERSTAND PROJECT IMPACT
+## STEP 2 — IMPACT ANALYSIS
 
 Before coding:
 
@@ -124,65 +129,60 @@ Before coding:
 * Identify dependencies
 * Evaluate regression risk
 * Evaluate startup impact
-* Evaluate module execution compatibility
+* Evaluate module-execution compatibility
 
-No code change before impact understanding.
+No code before impact clarity.
 
 ---
 
-## STEP 3 — IMPLEMENT
+## STEP 3 — IMPLEMENTATION
 
 * Minimal precise change
 * No unrelated refactor
 * Preserve architecture
-* Preserve startup integrity
+* Preserve startup
 * Preserve Windows compatibility
 * Preserve module execution
-* Avoid duplication
-* Avoid complexity
+* No duplication
+* No complexity
 * No debug artifacts
 
 ---
 
-## STEP 4 — STATIC VALIDATION + UNIT TESTING
+## STEP 4 — STATIC VALIDATION + TESTING
 
-### Static Validation
+### Static Validation Checklist
 
-Confirm:
+Must confirm:
 
 * No syntax errors
-* No indentation issues
-* No quote escaping issues
+* No indentation errors
 * No malformed strings
-* No copy-paste corruption
 * No markdown artifacts
 * No broken imports
 * No circular imports
-* No sys.path hacks
-* No unintended logic removal
-* No broad `except`
-* No silent error suppression
-* No hardcoded secrets
+* No `sys.path` hacks
+* No silent broad `except`
+* No secret exposure
 * No unsafe eval/exec
-* No variable shadowing
+* No shadowing
 * No dead code
 * No duplicate functions
 
-### Execution Safety Reasoning
+### Startup Safety Reasoning
 
-You must reason:
+Confirm:
 
-* Would startup still work?
-* Would CLI parsing still work?
-* Would GUI/terminal modes still initialize?
-* Would module execution still resolve imports?
+* Startup intact
+* CLI intact
+* GUI/terminal not broken
+* Module execution valid
 
-If uncertain:
-STOP.
+Uncertainty = STOP.
 
 ---
 
-### Unit Testing Policy
+## Unit Testing Law
 
 Tests must:
 
@@ -190,60 +190,56 @@ Tests must:
 * Not launch main
 * Not launch GUI
 * Not launch terminal
-* Not require user input
+* Not require input
 * Not perform real network calls
-* Not perform destructive filesystem operations
+* Not perform destructive FS ops
 * Be deterministic
 * Use pytest
 
-Run using:
+Run only:
 
 ```
 python3 -m pytest
 ```
 
-Never use:
+Never:
 
 ```
 pytest
 ```
 
-When logic changes:
+If logic changes:
 
 1. Identify changed files
-2. Add or update tests
-3. Ensure previous coverage preserved
-4. Ensure behavior changes are tested
-5. Ensure bug fixes include failing-before tests
+2. Add/update tests
+3. Preserve prior coverage
+4. Test behavior change
+5. Include failing-before test for bug fixes
 
-Use mocking for:
+Use:
 
-* Filesystem
-* Environment variables
-* Time
-* External services
-
-Prefer:
-
-* `tmp_path`
-* `monkeypatch`
-* `unittest.mock`
+* tmp_path
+* monkeypatch
+* unittest.mock
 
 ---
 
 ## STEP 5 — PRE-COMMIT REVIEW
 
-Before committing:
+Run:
 
-* Run: `git status --porcelain`
-* Review each file individually
-* Confirm relevance
-* Avoid unrelated staging
-* Avoid secrets
-* Avoid logs
-* Avoid env files
+```
+git status --porcelain
+```
 
-Stage intelligently:
+Review each file individually.
+
+Avoid:
+
+* Secrets
+* Logs
+* Env files
+* Unrelated files
 
 Prefer:
 
@@ -257,9 +253,9 @@ Use:
 git add .
 ```
 
-ONLY if ALL changes relate strictly to the task.
+ONLY if ALL changes strictly relate to task.
 
-Then run:
+Then:
 
 ```
 git diff --staged
@@ -267,18 +263,17 @@ git diff --staged
 
 Confirm:
 
-* Correct files staged
-* No unexpected modifications
-* Commit message matches diff
-* Correct branch selected
-* No protected branch active
+* Correct files
+* Expected diff
+* Correct branch
+* Not protected
+* Message matches diff
 
-If anything unexpected:
-STOP.
+Unexpected change = STOP.
 
 ---
 
-## STEP 6 — COMMIT
+## STEP 6 — COMMIT RULES
 
 Branch naming:
 
@@ -293,7 +288,7 @@ Rules:
 * hyphen-separated
 * concise
 
-Commit message format:
+Commit format:
 
 ```
 [AI Generated] <type>: <clear description>
@@ -304,39 +299,21 @@ Never copy user text blindly.
 
 ---
 
-# 6️⃣ PYTHON ARCHITECTURE RULES
+# 6️⃣ PYTHON ARCHITECTURE LAW
 
-## Execution Semantics
-
-Project runs as:
+Execution:
 
 ```
 python3 -m main
 ```
 
-Imports must support this.
+Do NOT modify `sys.path`.
 
-Do NOT modify sys.path.
-
----
-
-## Virtual Environment
-
-Create:
+Virtualenv:
 
 ```
 python3 -m venv .venv
-```
-
-Activate (PowerShell):
-
-```
 .venv\Scripts\Activate.ps1
-```
-
-Install packages:
-
-```
 python3 -m pip install <package>
 ```
 
@@ -344,15 +321,14 @@ Never use bare pip.
 
 ---
 
-## Code Quality
+## Code Standards
 
 * Python 3 only
 * PEP 8
-* Type hints when appropriate
+* Type hints where appropriate
 * Small focused functions
 * No global mutable state
 * Explicit error handling
-* No broad `except`
 * No debug prints
 * Clear naming
 * Avoid deep nesting
@@ -371,9 +347,8 @@ Only if `main()` exists.
 ## Windows Compatibility
 
 * Use `pathlib`
-* Avoid hardcoded slashes
+* No hardcoded slashes
 * Proper escaping
-* No malformed backslashes
 
 ---
 
@@ -386,7 +361,7 @@ Only if `main()` exists.
 
 ---
 
-## Async Rules
+## Async Rule
 
 If async exists:
 
@@ -396,26 +371,25 @@ If async exists:
 
 ---
 
-# 7️⃣ REGRESSION RISK CHECK
+# 7️⃣ REGRESSION RISK CHECK (MANDATORY)
 
-Before commit, internally ask:
+Before commit ask:
 
-* Could this break startup?
+* Break startup?
 * Break CLI?
 * Break GUI?
 * Break module execution?
-* Break Windows execution?
-* Introduce encoding issues?
-* Introduce circular imports?
+* Break Windows?
+* Encoding issues?
+* Circular imports?
 
-If risk uncertain:
-STOP.
+Uncertain = STOP.
 
 ---
 
-# 8️⃣ FAIL-SAFE RULE
+# 8️⃣ FAIL-SAFE LAW
 
-If uncertainty appears at ANY stage:
+At ANY uncertainty:
 
 * Do not guess
 * Do not partially commit
@@ -424,21 +398,21 @@ If uncertainty appears at ANY stage:
 
 ---
 
-# 9️⃣ FINAL OPERATING PRINCIPLE
+# 9️⃣ SUPREME PRINCIPLE
 
-This is a structured Python application.
-
-You must preserve:
+Preserve:
 
 * Clean architecture
 * Production safety
 * Windows compatibility
 * Module execution semantics
-* Non-interactive validation
 * Deterministic testing
 * Git discipline
 * Protected branch safety
-* Structured workflow order
+* Workflow order
 
 No step may be skipped.
 No order may be changed.
+No rule may be weakened.
+
+This constitution is binding.
