@@ -1,7 +1,7 @@
 from modules.prompts_manager import PromptsManager
 from modules.docs_manager import DocsManager
-from langchain_classic.chains.combine_documents import create_stuff_documents_chain
-from langchain_classic.text_splitter import RecursiveCharacterTextSplitter
+from langchain_core.chains.combine_documents import create_stuff_documents_chain
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 
 class PromptAnalyzerAgent:
@@ -19,7 +19,7 @@ class PromptAnalyzerAgent:
         "pdf",
     }
 
-    def __init__(self, llm, prompt_template: str = None, persona: str = None, debug: bool = False):
+    def __init__(self, llm, prompt_template: str = "", persona: str = None, debug: bool = False):
         self.llm = llm
         self.debug = debug
         self.prompt_template = prompt_template
@@ -118,7 +118,7 @@ class ConnectorManager:
         self.rag_agent = RAGAgent(self.document_chain, self.retriever, debug=self.config.DEBUG, config=self.config)
         self.simple_agent = SimpleLLMAgent(self.document_chain, debug=self.config.DEBUG)
 
-def getConnector(self):
+    def getConnector(self):
         if self.config.LLM_TYPE == "gemini":
             from modules.connectors.gemini_connector import GeminiConnector
             return GeminiConnector(self.config.LLM_AI_API_KEY, self.config.LLM_AI_MODEL, self.config.EMBEDDINGS_AI_MODEL, self.config.LLM_AI_TEMPERATURE)
