@@ -8,3 +8,4 @@ ttkbootstrap==1.20.1
 PyMuPDF==1.26.7
 faiss-cpu==1.13.2
 pytest==4.6.11
+langchain-lmstudio==0.1.0

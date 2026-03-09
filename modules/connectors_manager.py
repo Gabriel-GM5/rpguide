@@ -118,10 +118,13 @@ class ConnectorManager:
         self.rag_agent = RAGAgent(self.document_chain, self.retriever, debug=self.config.DEBUG, config=self.config)
         self.simple_agent = SimpleLLMAgent(self.document_chain, debug=self.config.DEBUG)
 
-    def getConnector(self):
+def getConnector(self):
         if self.config.LLM_TYPE == "gemini":
             from modules.connectors.gemini_connector import GeminiConnector
             return GeminiConnector(self.config.LLM_AI_API_KEY, self.config.LLM_AI_MODEL, self.config.EMBEDDINGS_AI_MODEL, self.config.LLM_AI_TEMPERATURE)
+        elif self.config.LLM_TYPE == "lmstudio":
+            from modules.connectors.lmstudio_connector import LMStudioConnector
+            return LMStudioConnector(self.config.LLM_AI_API_KEY, self.config.LLM_AI_MODEL, self.config.EMBEDDINGS_AI_MODEL, self.config.LLM_AI_TEMPERATURE)
         else:
             raise ValueError(f"Unsupported LLM type: {self.config.LLM_TYPE}")
 

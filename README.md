@@ -13,6 +13,7 @@ A multi-agent AI assistant with a modern GUI chat interface. The system intellig
 - **Multi-language Support**: English (en_us) and Portuguese (pt_br)
 - **Debug Mode**: Optional debug output showing which agent handles each request
 - **Document Loading**: Supports PDF, text, and markdown documents
+- **Multiple LLM Support**: Google Gemini and LM Studio
 
 ## Installation
 
@@ -32,7 +33,7 @@ cp .env.example .env
 
 Key variables:
 
-- `LLM_TYPE` - e.g. `gemini`
+- `LLM_TYPE` - e.g. `gemini` or `lmstudio`
 - `LLM_AI_API_KEY` - your provider API key
 - `LLM_AI_MODEL` - the model id to use
 - `EMBEDDINGS_AI_MODEL` - the embedding model id
@@ -45,6 +46,14 @@ Key variables:
 - `MODE` - `gui` for graphical interface or `terminal` for command-line chat (defaults to `gui`)
 
 See `.env.example` for a complete template.
+
+For LM Studio, use:
+```
+LLM_TYPE=lmstudio
+LLM_AI_API_KEY=http://localhost:1234/v1
+LLM_AI_MODEL=<model-name>
+EMBEDDINGS_AI_MODEL=<model-name>
+```
 
 ## Running the Application
 
@@ -110,6 +119,7 @@ The project requires the following Python packages (as listed in `requirements.t
 - ttkbootstrap==1.20.1
 - PyMuPDF==1.26.7
 - faiss-cpu==1.13.2
+- langchain-lmstudio==0.1.0
 
 ## License
 
