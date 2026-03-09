@@ -1,7 +1,7 @@
 from modules.prompts_manager import PromptsManager
 from modules.docs_manager import DocsManager
-from langchain_core.chains.combine_documents import create_stuff_documents_chain
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_classic.chains.combine_documents import create_stuff_documents_chain
+from langchain_classic.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 
 class PromptAnalyzerAgent:
