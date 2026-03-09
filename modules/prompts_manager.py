@@ -4,7 +4,13 @@ class PromptsManager:
     def __init__(self, config):
         self.config = config
         system_prompt_template = self._load_prompt("system")
-        self.system_prompt = system_prompt_template.replace("{PERSONA_DESCRIPTION}", self.config.AI_PERSONA).replace("{EXIT_COMMAND}", self.config.texts['exit.term'])
+        # Ensure config.AI_PERSONA is a string and config.texts['exit.term'] exists
+        persona_desc = getattr(config, 'AI_PERSONA', '') or ''
+        if hasattr(config, 'texts') and isinstance(config.texts, dict):
+            exit_command = config.texts.get('exit.term', '') or ''
+        else:
+            exit_command = ''
+        self.system_prompt = system_prompt_template.replace("{PERSONA_DESCRIPTION}", persona_desc).replace("{EXIT_COMMAND}", exit_command)
         self.human_prompt = self._load_prompt("human")
         try:
             self.analyzer_prompt = self._load_prompt("analyzer")

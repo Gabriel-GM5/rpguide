@@ -20,18 +20,19 @@ def load_texts(filepath: str) -> dict:
     return dict(parser["DEFAULT"])
 
 class Config:
-    # Use defaults for all values to ensure consistency in tests
-    LLM_TYPE = os.getenv("LLM_TYPE", None)
-    LLM_AI_API_KEY = os.getenv("LLM_AI_API_KEY", None)
-    LLM_AI_MODEL = os.getenv("LLM_AI_MODEL", None)
-    LLM_AI_TEMPERATURE = float(os.getenv("LLM_AI_TEMPERATURE", "0.0"))
-    LANGUAGE = os.getenv("LANGUAGE", "en_us")
-    AI_PERSONA = os.getenv("AI_PERSONA", None)
-    LOCAL_KNOWLEDGE_PATH = os.getenv("LOCAL_KNOWLEDGE_PATH", None)
-    LOCAL_KNOWLEDGE_DOC_TYPES = os.getenv("LOCAL_KNOWLEDGE_DOC_TYPES", "").split(",") if os.getenv("LOCAL_KNOWLEDGE_DOC_TYPES") else []
-    EMBEDDINGS_AI_MODEL = os.getenv("EMBEDDINGS_AI_MODEL", None)
-    DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes", "y")
-    MODE = os.getenv("MODE", "gui").lower()
-    texts = load_texts(f"texts/{LANGUAGE}.properties")
+    def __init__(self):
+        # Use defaults for all values to ensure consistency in tests
+        self.LLM_TYPE = os.getenv("LLM_TYPE", None)
+        self.LLM_AI_API_KEY = os.getenv("LLM_AI_API_KEY", None)
+        self.LLM_AI_MODEL = os.getenv("LLM_AI_MODEL", None)
+        self.LLM_AI_TEMPERATURE = float(os.getenv("LLM_AI_TEMPERATURE", "0.0"))
+        self.LANGUAGE = os.getenv("LANGUAGE", "en_us")
+        self.AI_PERSONA = os.getenv("AI_PERSONA", None)
+        self.LOCAL_KNOWLEDGE_PATH = os.getenv("LOCAL_KNOWLEDGE_PATH", None)
+        self.LOCAL_KNOWLEDGE_DOC_TYPES = os.getenv("LOCAL_KNOWLEDGE_DOC_TYPES", "").split(",") if os.getenv("LOCAL_KNOWLEDGE_DOC_TYPES") else []
+        self.EMBEDDINGS_AI_MODEL = os.getenv("EMBEDDINGS_AI_MODEL", None)
+        self.DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes", "y")
+        self.MODE = os.getenv("MODE", "gui").lower()
+        self.texts = load_texts(f"texts/{self.LANGUAGE}.properties")
 
 config = Config()
