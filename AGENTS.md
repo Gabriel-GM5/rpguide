@@ -3,10 +3,10 @@
 ## Build, Lint, and Test Commands
 
 ### Running Tests
-- Run all tests: `python run_tests.py`
-- Run a single test file: `python -m pytest tests/test_filename.py -v`
-- Run a specific test function: `python -m pytest tests/test_filename.py::test_function_name -v`
-- Run tests with coverage: `python -m pytest tests/ --cov=modules/ --cov-report=html`
+- Run all tests: `python3 run_tests.py`
+- Run a single test file: `python3 -m pytest tests/test_filename.py -v`
+- Run a specific test function: `python3 -m pytest tests/test_filename.py::test_function_name -v`
+- Run tests with coverage: `python3 -m pytest tests/ --cov=modules/ --cov-report=html`
 
 ### Linting
 - Check code style: `pylint modules/`
@@ -15,8 +15,8 @@
 
 ### Development Commands
 - Install dependencies: `pip install -r requirements.txt`
-- Run in GUI mode: `python main.py`
-- Run in terminal mode: `python main.py terminal`
+- Run in GUI mode: `python3 main.py`
+- Run in terminal mode: `python3 main.py terminal`
 
 ## Code Style Guidelines
 
