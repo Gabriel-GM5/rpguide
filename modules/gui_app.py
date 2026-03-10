@@ -3,12 +3,15 @@ from ttkbootstrap.constants import *
 from modules.connectors_manager import ConnectorManager
 from modules.configs import Config
 import threading
+import tkinter as tk
+from tkinter import filedialog
 
 class ChatApp:
     def __init__(self, root):
         self.root = root
         self.config = Config()
         self.connector = ConnectorManager(self.config)
+        self.uploaded_files = []  # Track uploaded files
         
         # Use localized window title
         window_title = self.config.texts.get('ui.window.title', 'RPGuide')
@@ -47,7 +50,12 @@ class ChatApp:
         input_frame = ttk.Frame(main_frame)
         input_frame.pack(fill=X, padx=0, pady=0)
         
-        self.input_field = ttk.Entry(input_frame, width=70)
+        # File upload button
+        upload_button_text = self.config.texts.get('ui.button.upload', 'Upload Files')
+        upload_button = ttk.Button(input_frame, text=upload_button_text, command=self.upload_files, bootstyle="primary")
+        upload_button.pack(side=LEFT, padx=(0, 5))
+        
+        self.input_field = ttk.Entry(input_frame, width=60)
         self.input_field.pack(side=LEFT, fill=BOTH, expand=True, padx=(0, 5))
         self.input_field.bind("<Return>", self.send_message)
         
@@ -61,6 +69,63 @@ class ChatApp:
         
         # Show initial greeting
         self.show_initial_greeting()
+    
+    def upload_files(self):
+        """Open file dialog to select files for upload."""
+        # Get all supported file types
+        filetypes = [
+            ("All files", "*.*"),
+            ("Text files", "*.txt"),
+            ("PDF files", "*.pdf"),
+            ("Word documents", "*.doc *.docx"),
+            ("Excel files", "*.xls *.xlsx"),
+            ("Markdown files", "*.md"),
+            ("HTML files", "*.html *.htm"),
+            ("Rich Text files", "*.rtf"),
+            ("CSV files", "*.csv")
+        ]
+        
+        # Open file dialog
+        filenames = tk.filedialog.askopenfilenames(
+            title="Select files to upload",
+            filetypes=filetypes
+        )
+        
+        if not filenames:
+            return
+            
+        # Process each selected file
+        for filename in filenames:
+            self.process_uploaded_file(filename)
+    
+    def process_uploaded_file(self, filepath):
+        """Process and store an uploaded file."""
+        import os
+        from pathlib import Path
+        
+        # Create uploads directory if it doesn't exist
+        upload_dir = Path("uploads")
+        upload_dir.mkdir(exist_ok=True)
+        
+        # Copy the file to uploads directory
+        filename = os.path.basename(filepath)
+        destination = upload_dir / filename
+        
+        try:
+            import shutil
+            shutil.copy2(filepath, destination)
+            
+            # Add to uploaded files list for context
+            self.uploaded_files.append(str(destination))
+            
+            # Show confirmation in chat
+            self.display_message("System", f"Uploaded: {filename}", is_user=False)
+            
+            if self.config.DEBUG:
+                print(f"[DEBUG] File uploaded: {destination}")
+        except Exception as e:
+            error_msg = self.config.texts.get('error.file.upload', f'Error uploading file: {str(e)}')
+            self.display_message("System", error_msg, is_user=False)
     
     def show_initial_greeting(self):
         """Display initial greeting from the AI."""

@@ -47,6 +47,7 @@ class DocsManager:
         base_dir = Path(__file__).resolve().parent.parent
         knowledge_dir = base_dir / self.local_knowledge_path
 
+        # Load from local knowledge path
         for file in knowledge_dir.glob("**/*"):
             if not file.is_file():
                 continue
@@ -90,5 +91,52 @@ class DocsManager:
                         f"{self.config.texts['file.loading.error']} "
                         f"{file.name} (unstructured): {e}"
                     )
+
+        # Load uploaded files
+        try:
+            upload_dir = Path("uploads")
+            if upload_dir.exists():
+                for file in upload_dir.glob("**/*"):
+                    if not file.is_file():
+                        continue
+                    
+                    ext = file.suffix.lower()
+                    
+                    # Use the same loaders for uploaded files
+                    loader_cls = self.specialized_loaders.get(ext)
+                    if loader_cls:
+                        try:
+                            docs.extend(self._load(loader_cls, file))
+                            if config.DEBUG:
+                                print(
+                                    f"{self.config.texts['file']} {file.name} "
+                                    f"{self.config.texts['loaded.successfully']} (uploaded)"
+                                )
+                            continue
+                        except Exception as e:
+                            if config.DEBUG:
+                                print(
+                                    f"{self.config.texts['file.loading.error']} "
+                                    f"{file.name} (uploaded): {e}"
+                                )
+                    
+                    # Fallback for uploaded files
+                    try:
+                        loader = UnstructuredLoader(str(file))
+                        docs.extend(loader.load())
+                        if config.DEBUG:
+                            print(
+                                f"{self.config.texts['file']} {file.name} "
+                                f"{self.config.texts['loaded.successfully']} (uploaded fallback)"
+                            )
+                    except Exception as e:
+                        if config.DEBUG:
+                            print(
+                                f"{self.config.texts['file.loading.error']} "
+                                f"{file.name} (uploaded fallback): {e}"
+                            )
+        except Exception as e:
+            if config.DEBUG:
+                print(f"Error loading uploaded files: {e}")
 
         return docs
