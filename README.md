@@ -13,6 +13,7 @@ A multi-agent AI assistant with a modern GUI chat interface. The system intellig
 - **Multi-language Support**: English (en_us) and Portuguese (pt_br)
 - **Debug Mode**: Optional debug output showing which agent handles each request
 - **Document Loading**: Supports PDF, text, and markdown documents
+- **File Upload Feature**: Users can upload files directly through the GUI interface for RAG processing
 - **Multiple LLM Support**: Google Gemini and LM Studio
 
 ## Installation
@@ -70,6 +71,22 @@ python3 main.py terminal
 ```
 
 The application will run in the mode specified by the `MODE` environment variable or command-line argument. When running with no arguments, it defaults to GUI mode. When using the `terminal` argument, it runs in command-line mode instead of GUI mode.
+
+### File Upload Feature
+
+Users can upload files directly through the GUI interface using the "Upload Files" button. Uploaded files will be stored in the `uploads/` directory and automatically included in the RAG processing context.
+
+The system supports uploading various document formats including:
+- PDF documents (.pdf)
+- Text files (.txt)
+- Word documents (.doc, .docx)
+- Excel spreadsheets (.xls, .xlsx)
+- Markdown files (.md)
+- HTML files (.html, .htm)
+- Rich Text Format files (.rtf)
+- CSV files (.csv)
+
+Uploaded files are automatically processed and made available to the AI assistant for context-aware responses.
 
 ### Application Structure
 
