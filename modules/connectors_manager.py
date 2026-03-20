@@ -122,7 +122,7 @@ class ConnectorManager:
         if self.config.LLM_TYPE == "gemini":
             from modules.connectors.gemini_connector import GeminiConnector
             return GeminiConnector(self.config.LLM_AI_API_KEY, self.config.LLM_AI_MODEL, self.config.EMBEDDINGS_AI_MODEL, self.config.LLM_AI_TEMPERATURE)
-        elif self.config.LLM_TYPE == "lmstudio":
+        elif self.config.LLM_TYPE == "lmstudio" or self.config.LLM_TYPE == "openai":
             from modules.connectors.openai_connector import OpenAIConnector
             return OpenAIConnector(self.config.LLM_AI_API_KEY, self.config.LLM_AI_MODEL, self.config.EMBEDDINGS_AI_MODEL, self.config.LLM_AI_TEMPERATURE)
         else:
