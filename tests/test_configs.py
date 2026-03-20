@@ -130,7 +130,7 @@ def test_config_default_values():
                 config = Config()
                 
                 # Test defaults - we need to check what actually gets set
-                assert config.LLM_TYPE == 'gemini'  # This comes from the .env file
+                assert config.LLM_TYPE is None  # This comes from the .env file but not set in test
                 assert config.LLM_AI_API_KEY is None
                 assert config.LLM_AI_MODEL is None
                 assert config.LLM_AI_TEMPERATURE == 0.0  # Default from float conversion
