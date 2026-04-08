@@ -24,6 +24,7 @@ class Config:
         # Use defaults for all values to ensure consistency in tests
         self.LLM_TYPE = os.getenv("LLM_TYPE", None)
         self.LLM_AI_API_KEY = os.getenv("LLM_AI_API_KEY", None)
+        self.LLM_AI_BASE_URL = os.getenv("LLM_AI_BASE_URL", None)
         self.LLM_AI_MODEL = os.getenv("LLM_AI_MODEL", None)
         self.LLM_AI_TEMPERATURE = float(os.getenv("LLM_AI_TEMPERATURE", "0.0"))
         self.LANGUAGE = os.getenv("LANGUAGE", "en_us")

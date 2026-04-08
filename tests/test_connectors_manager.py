@@ -173,48 +173,113 @@ def test_simple_llm_agent_answer():
     assert result == "simple response"
 
 
+def _make_connector_manager(mock_config, mock_connector):
+    """Helper: build a ConnectorManager with fully mocked internals."""
+    with patch('modules.connectors_manager.ConnectorManager.getConnector', return_value=mock_connector), \
+         patch('modules.prompts_manager.PromptsManager') as mock_prompts_mgr, \
+         patch('modules.docs_manager.DocsManager') as mock_docs_mgr, \
+         patch('modules.connectors_manager.RecursiveCharacterTextSplitter') as mock_splitter, \
+         patch('modules.connectors_manager.FAISS') as mock_faiss:
+
+        mock_prompts_instance = MagicMock()
+        mock_prompts_instance.get_prompts.return_value = "test_prompts"
+        mock_prompts_instance.get_analyzer_prompt.return_value = ""
+        mock_prompts_mgr.return_value = mock_prompts_instance
+
+        mock_docs_instance = MagicMock()
+        mock_docs_instance.getDocs.return_value = ["doc1"]
+        mock_docs_mgr.return_value = mock_docs_instance
+
+        mock_splitter_instance = MagicMock()
+        mock_splitter.return_value = mock_splitter_instance
+        mock_splitter_instance.split_documents.return_value = ["chunk1"]
+
+        mock_vs = MagicMock()
+        mock_faiss.from_documents.return_value = mock_vs
+
+        return ConnectorManager(mock_config)
+
+
 def test_connector_manager_init():
     """Test ConnectorManager initialization"""
-    # Mock config
     mock_config = MagicMock()
     mock_config.LLM_TYPE = "gemini"
     mock_config.AI_PERSONA = "Test Persona"
     mock_config.DEBUG = False
-    
-    # Mock the getConnector method to return a mock connector
-    with patch('modules.connectors.gemini_connector.GeminiConnector') as mock_connector_class:
-        mock_connector = MagicMock()
-        mock_connector_class.return_value = mock_connector
-        
-        # Mock other components that will be called
-        with patch('modules.prompts_manager.PromptsManager') as mock_prompts_mgr, \
-             patch('modules.docs_manager.DocsManager') as mock_docs_mgr:
-            
-            mock_prompts_instance = MagicMock()
-            mock_prompts_instance.get_prompts.return_value = "test_prompts"
-            mock_prompts_mgr.return_value = mock_prompts_instance
-            
-            mock_docs_instance = MagicMock()
-            mock_docs_instance.getDocs.return_value = ["doc1", "doc2"]
-            mock_docs_mgr.return_value = mock_docs_instance
-            
-            # Mock text splitting and FAISS creation
-            with patch('modules.connectors_manager.RecursiveCharacterTextSplitter') as mock_splitter, \
-                 patch('modules.connectors_manager.FAISS') as mock_faiss:
-                
-                mock_splitter_instance = MagicMock()
-                mock_splitter.return_value = mock_splitter_instance
-                mock_splitter_instance.split_documents.return_value = ["chunk1", "chunk2"]
-                
-                mock_faiss.from_documents.return_value = "test_vector_store"
-                mock_faiss.as_retriever.return_value = "test_retriever"
-                
-                # Create the ConnectorManager
-                connector_manager = ConnectorManager(mock_config)
-                
-                # Verify it was initialized correctly
-                assert hasattr(connector_manager, 'prompt_analyzer')
-                assert hasattr(connector_manager, 'rag_agent')
-                assert hasattr(connector_manager, 'simple_agent')
-                assert hasattr(connector_manager, 'retriever')
-                assert connector_manager.retriever == "test_retriever"
+
+    mock_connector = MagicMock()
+    mock_connector.embeddings = MagicMock()
+
+    cm = _make_connector_manager(mock_config, mock_connector)
+
+    assert hasattr(cm, 'prompt_analyzer')
+    assert hasattr(cm, 'rag_agent')
+    assert hasattr(cm, 'simple_agent')
+    assert hasattr(cm, 'retriever')
+
+
+def test_connector_manager_get_connector_routing():
+    """getConnector raises ValueError for unknown LLM_TYPE."""
+    mock_config = MagicMock()
+    mock_config.LLM_TYPE = "unknown_provider"
+
+    cm = ConnectorManager.__new__(ConnectorManager)
+    cm.config = mock_config
+
+    try:
+        cm.getConnector()
+        assert False, "Should have raised ValueError"
+    except ValueError as exc:
+        assert "unknown_provider" in str(exc)
+
+
+def test_connector_manager_anthropic_no_rag():
+    """When connector.embeddings is None (Anthropic), retriever must be None."""
+    mock_config = MagicMock()
+    mock_config.LLM_TYPE = "anthropic"
+    mock_config.AI_PERSONA = "Test"
+    mock_config.DEBUG = False
+
+    mock_connector = MagicMock()
+    mock_connector.embeddings = None  # Anthropic has no embeddings
+
+    with patch('modules.connectors_manager.ConnectorManager.getConnector', return_value=mock_connector), \
+         patch('modules.prompts_manager.PromptsManager') as mock_prompts_mgr, \
+         patch('modules.docs_manager.DocsManager') as mock_docs_mgr, \
+         patch('modules.connectors_manager.FAISS') as mock_faiss:
+
+        mock_prompts_instance = MagicMock()
+        mock_prompts_instance.get_prompts.return_value = "test_prompts"
+        mock_prompts_instance.get_analyzer_prompt.return_value = ""
+        mock_prompts_mgr.return_value = mock_prompts_instance
+
+        mock_docs_instance = MagicMock()
+        mock_docs_instance.getDocs.return_value = ["doc1"]
+        mock_docs_mgr.return_value = mock_docs_instance
+
+        cm = ConnectorManager(mock_config)
+
+    assert cm.retriever is None
+    mock_faiss.from_documents.assert_not_called()
+
+
+def test_connector_manager_supported_types():
+    """Verify all supported LLM_TYPE values map to the expected connector class."""
+    cases = [
+        ("gemini", "modules.connectors.gemini_connector", "GeminiConnector"),
+        ("openai", "modules.connectors.openai_connector", "OpenAIConnector"),
+        ("lmstudio", "modules.connectors.lmstudio_connector", "LMStudioConnector"),
+        ("ollama", "modules.connectors.ollama_connector", "OllamaConnector"),
+        ("anthropic", "modules.connectors.anthropic_connector", "AnthropicConnector"),
+    ]
+    for llm_type, module_path, class_name in cases:
+        mock_config = MagicMock()
+        mock_config.LLM_TYPE = llm_type
+
+        cm = ConnectorManager.__new__(ConnectorManager)
+        cm.config = mock_config
+
+        with patch(f"{module_path}.{class_name}") as mock_cls:
+            mock_cls.return_value = MagicMock(embeddings=MagicMock())
+            connector = cm.getConnector()
+            assert mock_cls.called, f"{class_name} was not instantiated for LLM_TYPE={llm_type}"

@@ -106,7 +106,7 @@ class ConnectorManager:
         docs = docsMgr.getDocs()
         
         self.retriever = None
-        if docs:
+        if docs and self.connector.embeddings is not None:
             splitter = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=30)
             chunks = splitter.split_documents(docs)
             vectorStore = FAISS.from_documents(chunks, self.connector.embeddings)
@@ -119,14 +119,24 @@ class ConnectorManager:
         self.simple_agent = SimpleLLMAgent(self.document_chain, debug=self.config.DEBUG)
 
     def getConnector(self):
-        if self.config.LLM_TYPE == "gemini":
+        llm_type = self.config.LLM_TYPE
+        if llm_type == "gemini":
             from modules.connectors.gemini_connector import GeminiConnector
             return GeminiConnector(self.config.LLM_AI_API_KEY, self.config.LLM_AI_MODEL, self.config.EMBEDDINGS_AI_MODEL, self.config.LLM_AI_TEMPERATURE)
-        elif self.config.LLM_TYPE == "lmstudio" or self.config.LLM_TYPE == "openai":
+        elif llm_type == "openai":
             from modules.connectors.openai_connector import OpenAIConnector
-            return OpenAIConnector(self.config.LLM_AI_API_KEY, self.config.LLM_AI_MODEL, self.config.EMBEDDINGS_AI_MODEL, self.config.LLM_AI_TEMPERATURE)
+            return OpenAIConnector(self.config.LLM_AI_API_KEY, self.config.LLM_AI_BASE_URL, self.config.LLM_AI_MODEL, self.config.EMBEDDINGS_AI_MODEL, self.config.LLM_AI_TEMPERATURE)
+        elif llm_type == "lmstudio":
+            from modules.connectors.lmstudio_connector import LMStudioConnector
+            return LMStudioConnector(self.config.LLM_AI_BASE_URL, self.config.LLM_AI_MODEL, self.config.EMBEDDINGS_AI_MODEL, self.config.LLM_AI_TEMPERATURE)
+        elif llm_type == "ollama":
+            from modules.connectors.ollama_connector import OllamaConnector
+            return OllamaConnector(self.config.LLM_AI_BASE_URL, self.config.LLM_AI_MODEL, self.config.EMBEDDINGS_AI_MODEL, self.config.LLM_AI_TEMPERATURE)
+        elif llm_type == "anthropic":
+            from modules.connectors.anthropic_connector import AnthropicConnector
+            return AnthropicConnector(self.config.LLM_AI_API_KEY, self.config.LLM_AI_MODEL, self.config.LLM_AI_TEMPERATURE)
         else:
-            raise ValueError(f"Unsupported LLM type: {self.config.LLM_TYPE}")
+            raise ValueError(f"Unsupported LLM type: {llm_type}")
 
     def call(self, question):
         decision = self.prompt_analyzer.decide(question)

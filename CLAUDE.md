@@ -44,7 +44,10 @@ Loads from `LOCAL_KNOWLEDGE_PATH` (env) and `uploads/` directory. Specialized lo
 
 Swap LLM provider via `LLM_TYPE` env var:
 - `gemini` → `gemini_connector.py` (Google Generative AI)
-- `openai` → `openai_connector.py` (OpenAI or LM Studio via OpenAI-compatible API)
+- `openai` → `openai_connector.py` (OpenAI; optional `LLM_AI_BASE_URL` for custom endpoints)
+- `lmstudio` → `lmstudio_connector.py` (LM Studio via OpenAI-compatible API; defaults to `http://localhost:1234/v1`)
+- `ollama` → `ollama_connector.py` (Ollama; defaults to `http://localhost:11434`)
+- `anthropic` → `anthropic_connector.py` (Anthropic/Claude; RAG disabled — no embeddings API)
 
 Each connector exposes both an LLM instance and an embeddings model instance consumed by `ConnectorManager`.
 
@@ -60,10 +63,11 @@ Single `Config` class wrapping `python-dotenv`. All `.env` keys have defaults. L
 
 | Var | Values |
 |-----|--------|
-| `LLM_TYPE` | `gemini`, `openai` |
-| `LLM_AI_API_KEY` | provider API key |
+| `LLM_TYPE` | `gemini`, `openai`, `lmstudio`, `ollama`, `anthropic` |
+| `LLM_AI_API_KEY` | provider API key (not required for `lmstudio` / `ollama`) |
+| `LLM_AI_BASE_URL` | custom API base URL — required for `lmstudio` and `ollama`; optional override for `openai` |
 | `LLM_AI_MODEL` | model ID string |
-| `EMBEDDINGS_AI_MODEL` | embeddings model ID |
+| `EMBEDDINGS_AI_MODEL` | embeddings model ID (unused for `anthropic` — RAG is disabled) |
 | `LANGUAGE` | `en_us`, `pt_br` |
 | `DEBUG` | `true` / `false` — shows agent routing decisions in UI |
 | `LOCAL_KNOWLEDGE_PATH` | path to docs for RAG |
