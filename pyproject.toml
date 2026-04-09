@@ -1,0 +1,22 @@
+[project]
+name = "rpguide"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "langchain-classic==1.0.1",
+    "langchain-community==0.4.1",
+    "langchain-core==1.2.8",
+    "langchain-google-genai==4.2.0",
+    "langchain-unstructured==1.0.1",
+    "python-dotenv==1.2.1",
+    "ttkbootstrap==1.20.1",
+    "pymupdf==1.26.7",
+    "faiss-cpu==1.13.2",
+    "anthropic>=0.39.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0",
+    "pytest-cov>=2.8",
+]

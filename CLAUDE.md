@@ -4,25 +4,37 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
+> **Requires [uv](https://docs.astral.sh/uv/getting-started/installation/).**
+> Install it once with `pip install uv` (or via the standalone installer), then use the
+> commands below. `uv` manages the virtual environment and lockfile automatically.
+
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+# Install / sync dependencies (creates .venv on first run)
+uv sync --dev                    # install all deps including dev group
+uv sync                          # install only production deps
 
 # Run (GUI mode default)
-python3 main.py
-python3 main.py terminal
+uv run python main.py
+uv run python main.py terminal
 
 # Tests
-python3 run_tests.py                                             # all tests
-python3 -m pytest tests/test_filename.py -v                     # single file
-python3 -m pytest tests/test_filename.py::test_function_name -v # single test
-python3 -m pytest tests/ --cov=modules/ --cov-report=html       # with coverage
+uv run pytest tests/ -v                                          # all tests
+uv run pytest tests/test_filename.py -v                         # single file
+uv run pytest tests/test_filename.py::test_function_name -v     # single test
+uv run pytest tests/ --cov=modules/ --cov-report=html           # with coverage
 
 # Lint / format
-pylint modules/
-black modules/
-flake8 modules/
+uv run pylint modules/
+uv run black modules/
+uv run flake8 modules/
+
+# Dependency management
+uv add <package>                 # add a production dependency
+uv add --dev <package>           # add a dev dependency
+uv lock                          # regenerate uv.lock after manual edits to pyproject.toml
 ```
+
+> **Note:** `uv` is invocable as `python3 -m uv` if the `uv` binary is not on PATH.
 
 ## Architecture
 
@@ -119,11 +131,11 @@ These rules govern how the AI agent must behave throughout every task in this pr
 
 - After any implementation, run the full test suite:
   ```bash
-  python run_tests.py
+  uv run pytest tests/ -v
   ```
 - For targeted changes, run the relevant test file:
   ```bash
-  python -m pytest tests/test_<module>.py -v
+  uv run pytest tests/test_<module>.py -v
   ```
 - If the change affects agent routing, RAG retrieval, or connector behavior, write or update tests to cover it before committing.
 - Never commit code that causes test failures. Fix the root cause — do not disable or delete tests to make the suite pass.

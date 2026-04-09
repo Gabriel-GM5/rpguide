@@ -1,12 +1,13 @@
-langchain_classic==1.0.1
-langchain_community==0.4.1
-langchain_core==1.2.8
-langchain_google_genai==4.2.0
-langchain_unstructured==1.0.1
+# Legacy pip compatibility file.
+# Source of truth is pyproject.toml + uv.lock.
+# To regenerate: uv export --no-hashes -o requirements.txt
+langchain-classic==1.0.1
+langchain-community==0.4.1
+langchain-core==1.2.8
+langchain-google-genai==4.2.0
+langchain-unstructured==1.0.1
 python-dotenv==1.2.1
 ttkbootstrap==1.20.1
-PyMuPDF==1.26.7
+pymupdf==1.26.7
 faiss-cpu==1.13.2
-pytest==4.6.11
-langchain-lmstudio==0.1.0
 anthropic>=0.39.0
