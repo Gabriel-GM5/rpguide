@@ -45,10 +45,14 @@ class DocsManager:
     def getDocs(self):
         docs = []
         base_dir = Path(__file__).resolve().parent.parent
-        knowledge_dir = base_dir / self.local_knowledge_path
 
-        # Load from local knowledge path
-        for file in knowledge_dir.glob("**/*"):
+        # Load from local knowledge path (skip when not configured)
+        if not self.local_knowledge_path:
+            knowledge_dir = None
+        else:
+            knowledge_dir = base_dir / self.local_knowledge_path
+
+        for file in (knowledge_dir.glob("**/*") if knowledge_dir else []):
             if not file.is_file():
                 continue
 

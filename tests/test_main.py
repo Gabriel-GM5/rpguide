@@ -22,7 +22,7 @@ def test_main_mode_selection():
     try:
         # Test with no arguments (should default to gui)
         with patch('sys.argv', ['main.py']):
-            with patch('modules.configs.Config') as mock_config_class:
+            with patch('main.Config') as mock_config_class:
                 mock_config = MagicMock()
                 mock_config.MODE = "gui"  # Default from .env
                 mock_config_class.return_value = mock_config
@@ -56,7 +56,7 @@ def test_main_invalid_mode():
 
     try:
         with patch('sys.argv', ['main.py', 'invalid_mode']):
-            with patch('modules.configs.Config') as mock_config_class:
+            with patch('main.Config') as mock_config_class:
                 mock_config = MagicMock()
                 mock_config.MODE = "gui"  # Default from .env
                 mock_config_class.return_value = mock_config
@@ -87,7 +87,7 @@ def test_main_valid_mode_argument():
     try:
         # Test with terminal argument
         with patch('sys.argv', ['main.py', 'terminal']):
-            with patch('modules.configs.Config') as mock_config_class:
+            with patch('main.Config') as mock_config_class:
                 mock_config = MagicMock()
                 mock_config.MODE = "gui"  # Default from .env
                 mock_config_class.return_value = mock_config
@@ -121,7 +121,7 @@ def test_main_with_gui_mode():
     try:
         # Test with gui argument
         with patch('sys.argv', ['main.py', 'gui']):
-            with patch('modules.configs.Config') as mock_config_class:
+            with patch('main.Config') as mock_config_class:
                 mock_config = MagicMock()
                 mock_config.MODE = "terminal"  # Default from .env
                 mock_config_class.return_value = mock_config
