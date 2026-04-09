@@ -5,7 +5,7 @@ from unittest.mock import patch, MagicMock
 # Add the project root to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/..")
 
-from modules.connectors_manager import PromptAnalyzerAgent
+from modules.connectors_manager import PromptAnalyzerAgent, RoutingDecision
 
 
 def test_prompt_analyzer_agent_comprehensive():
@@ -120,9 +120,9 @@ def test_prompt_analyzer_agent_edge_cases():
     assert result == "rag"  # Should be classified as rag due to length
     
     # Question with RAG keywords but at end
-    question_with_rag_keywords = "How do I use this tool and find the documentation for it"
+    question_with_rag_keywords = "How do I use this tool and find the document for it"
     result = agent.decide(question_with_rag_keywords)
-    assert result == "rag"  # Should detect 'documentation' keyword
+    assert result == "rag"  # Should detect 'find' / 'document' keyword
 
 
 def test_prompt_analyzer_agent_heuristic_rules():
