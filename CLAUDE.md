@@ -71,6 +71,17 @@ Templates are plain `.txt` files loaded by `prompts_manager.py`. Naming: `{syste
 
 Single `Config` class wrapping `python-dotenv`. All `.env` keys have defaults. Localization strings come from `texts/{LANGUAGE}.properties` key=value files; accessed as `config.texts["key"]`.
 
+## Build-mode setup
+
+When the app runs as a PyInstaller executable (`sys.frozen`), it does **not** read `.env`. Instead:
+
+1. On first launch, `Config.needs_setup` is `True` and `main.py` opens the **setup wizard** (`modules/setup_app.py`) — a ttkbootstrap GUI that collects all LLM provider settings.
+2. Settings are saved to `%APPDATA%\rpguide\config.json` (Windows) or `~/rpguide/config.json` (other platforms).
+3. On subsequent launches, `Config` loads from that JSON file, injecting values into `os.environ` before reading them — the rest of the startup path is unchanged.
+4. In dev mode (`sys.frozen` is False), the existing `.env` flow is preserved.
+
+The setup wizard (`run_setup()`) can be re-invoked at any time to reconfigure the app.
+
 ## Key env vars
 
 | Var | Values |

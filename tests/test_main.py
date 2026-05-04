@@ -89,6 +89,7 @@ def test_main_valid_mode_argument():
         with patch('sys.argv', ['main.py', 'terminal']):
             with patch('main.Config') as mock_config_class:
                 mock_config = MagicMock()
+                mock_config.needs_setup = False
                 mock_config.MODE = "gui"  # Default from .env
                 mock_config_class.return_value = mock_config
 
@@ -113,6 +114,55 @@ def test_main_valid_mode_argument():
         os.environ.update(original_env)
 
 
+def test_main_triggers_setup_when_needed():
+    """main() must run the setup wizard when config.needs_setup is True."""
+    original_env = dict(os.environ)
+    try:
+        configs = [MagicMock(), MagicMock()]
+        configs[0].needs_setup = True
+        configs[0].MODE = "gui"
+        configs[1].needs_setup = False
+        configs[1].MODE = "gui"
+
+        with patch("sys.argv", ["main.py"]):
+            with patch("main.Config", side_effect=configs):
+                with patch("modules.setup_app.run_setup") as mock_setup:
+                    with patch("modules.gui_app.run_gui"):
+                        from main import main
+                        try:
+                            main()
+                        except SystemExit:
+                            pass
+                        mock_setup.assert_called_once()
+    finally:
+        os.environ.clear()
+        os.environ.update(original_env)
+
+
+def test_main_skips_setup_when_not_needed():
+    """main() must not run setup when needs_setup is False."""
+    original_env = dict(os.environ)
+    try:
+        with patch("sys.argv", ["main.py"]):
+            with patch("main.Config") as mock_config_class:
+                mock_config = MagicMock()
+                mock_config.needs_setup = False
+                mock_config.MODE = "gui"
+                mock_config_class.return_value = mock_config
+
+                with patch("modules.setup_app.run_setup") as mock_setup:
+                    with patch("modules.gui_app.run_gui"):
+                        from main import main
+                        try:
+                            main()
+                        except SystemExit:
+                            pass
+                        mock_setup.assert_not_called()
+    finally:
+        os.environ.clear()
+        os.environ.update(original_env)
+
+
 def test_main_with_gui_mode():
     """Test main function with gui mode argument"""
     # Save original environment
@@ -123,6 +173,7 @@ def test_main_with_gui_mode():
         with patch('sys.argv', ['main.py', 'gui']):
             with patch('main.Config') as mock_config_class:
                 mock_config = MagicMock()
+                mock_config.needs_setup = False
                 mock_config.MODE = "terminal"  # Default from .env
                 mock_config_class.return_value = mock_config
 

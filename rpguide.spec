@@ -30,6 +30,7 @@ all_hidden = (
     lc_h + lcc_h + lck_h + lcg_h + lcu_h + lcx_h + ttk_h
     + collect_submodules("modules.connectors")
     + [
+        "modules.setup_app",
         # provider connectors (loaded dynamically via LLM_TYPE env var)
         "modules.connectors.gemini_connector",
         "modules.connectors.openai_connector",
