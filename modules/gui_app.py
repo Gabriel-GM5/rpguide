@@ -87,7 +87,10 @@ class ChatApp:
 
     def _restart(self):
         self.root.destroy()
-        os.execv(sys.executable, [sys.executable] + sys.argv)
+        # In a frozen EXE sys.argv[0] is already the executable path; in dev mode
+        # prepend sys.executable so Python receives the script as the first real arg.
+        args = sys.argv if getattr(sys, "frozen", False) else [sys.executable] + sys.argv
+        os.execv(sys.executable, args)
 
     def upload_files(self):
         """Open file dialog to select files for upload."""
