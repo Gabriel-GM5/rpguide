@@ -174,3 +174,35 @@ Example:
 - Only merge to `main` via a pull request, and only when the user explicitly requests it.
 - Never force-push, never reset published commits, never use `--no-verify` to skip hooks.
 - If a pre-commit hook fails, fix the underlying issue — do not bypass it.
+
+### 9. Pull Request Standards
+
+Every pull request created by the agent **must** follow these rules:
+
+**Title format:**
+```
+<type>: <short description>
+```
+Same types as commit messages: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`.
+
+**Body must include:**
+
+```markdown
+## Summary
+
+- <bullet describing what changed and why>
+
+## Test plan
+
+- [ ] <manual or automated step to verify the change>
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+```
+
+**Rules:**
+- The `🤖 Generated with [Claude Code](https://claude.com/claude-code)` footer is **mandatory** — it makes AI authorship explicit and traceable.
+- The summary must describe *what* changed and *why*, not just list files.
+- The test plan must include at least one concrete, actionable verification step.
+- Do not open a PR unless all tests pass and the self-review checklist (Rule 6) is complete.
+- Target branch is always `main` unless the user specifies otherwise.
+- Before creating the PR, verify the branch is pushed to remote (`git push -u origin <branch>`).
