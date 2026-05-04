@@ -4,9 +4,14 @@ from modules.configs import Config
 def main():
     try:
         config = Config()
-        
+
+        if config.needs_setup:
+            from modules.setup_app import run_setup
+            run_setup()
+            config = Config()
+
         # Determine mode: command-line argument takes precedence over .env
-        mode = config.MODE  # Default from .env
+        mode = config.MODE  # Default from .env / user config
         
         if len(sys.argv) > 1:
             arg_mode = sys.argv[1].lower()

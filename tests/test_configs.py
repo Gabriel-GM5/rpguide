@@ -1,11 +1,13 @@
+import json
 import os
 import sys
+import tempfile
 from unittest.mock import patch, MagicMock
 
 # Add the project root to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)) + "/..")
 
-from modules.configs import Config, load_texts
+from modules.configs import Config, load_texts, load_user_config, save_user_config
 
 
 def test_load_texts_valid_file():
@@ -102,6 +104,71 @@ def test_config_initialization():
         # Restore original environment
         os.environ.clear()
         os.environ.update(original_env)
+
+
+def test_save_and_load_user_config():
+    """Test that save_user_config writes and load_user_config reads back correctly."""
+    with tempfile.TemporaryDirectory() as tmp:
+        with patch("modules.configs._user_config_dir", return_value=tmp):
+            with patch("modules.configs._user_config_path", return_value=os.path.join(tmp, "config.json")):
+                data = {"LLM_TYPE": "gemini", "LLM_AI_API_KEY": "key123", "LLM_AI_MODEL": "gemini-pro"}
+                save_user_config(data)
+                loaded = load_user_config()
+                assert loaded == data
+
+
+def test_load_user_config_missing_file():
+    """Test that load_user_config returns empty dict when config file does not exist."""
+    with patch("modules.configs._user_config_path", return_value="/nonexistent/path/config.json"):
+        result = load_user_config()
+        assert result == {}
+
+
+def test_load_user_config_corrupt_file():
+    """Test that load_user_config returns empty dict on malformed JSON."""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as fh:
+        fh.write("{not valid json")
+        tmp_path = fh.name
+    try:
+        with patch("modules.configs._user_config_path", return_value=tmp_path):
+            result = load_user_config()
+            assert result == {}
+    finally:
+        os.unlink(tmp_path)
+
+
+def test_needs_setup_frozen_no_config():
+    """needs_setup is True when running frozen with no user config present."""
+    with patch("modules.configs._FROZEN", True):
+        with patch("modules.configs._user_config_path", return_value="/nonexistent/config.json"):
+            with patch("modules.configs.load_user_config", return_value={}):
+                with patch("modules.configs.load_texts", return_value={}):
+                    config = Config()
+                    assert config.needs_setup is True
+
+
+def test_needs_setup_frozen_config_exists():
+    """needs_setup is False when running frozen with user config present."""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as fh:
+        json.dump({"LLM_TYPE": "gemini"}, fh)
+        tmp_path = fh.name
+    try:
+        with patch("modules.configs._FROZEN", True):
+            with patch("modules.configs._user_config_path", return_value=tmp_path):
+                with patch("modules.configs.load_user_config", return_value={"LLM_TYPE": "gemini"}):
+                    with patch("modules.configs.load_texts", return_value={}):
+                        config = Config()
+                        assert config.needs_setup is False
+    finally:
+        os.unlink(tmp_path)
+
+
+def test_needs_setup_not_frozen():
+    """needs_setup is always False in non-frozen (dev) mode."""
+    with patch("modules.configs._FROZEN", False):
+        with patch("modules.configs.load_texts", return_value={}):
+            config = Config()
+            assert config.needs_setup is False
 
 
 def test_config_default_values():
