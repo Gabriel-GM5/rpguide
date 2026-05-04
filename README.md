@@ -1,143 +1,175 @@
 # rpguide
+
 Personal Persona-Based AI Assistant for General Purposes Usage
 
 A multi-agent AI assistant with a modern GUI chat interface. The system intelligently routes questions between a Retrieval-Augmented Generation (RAG) agent for document-based answers and a simple LLM agent for general queries.
 
 ## Features
 
-- **Multi-Agent Architecture**: 
+- **Multi-Agent Architecture**:
   - Prompt Analyzer Agent: Classifies questions as RAG or simple LLM
   - RAG Agent: Answers questions using loaded knowledge documents
   - Simple LLM Agent: Answers general questions without document context
-- **GUI Chat Interface**: Modern ttkbootstrap-based interface with conversation history
-- **Multi-language Support**: English (en_us) and Portuguese (pt_br)
+- **GUI & Terminal Modes**: Modern ttkbootstrap-based GUI or lightweight terminal chat
+- **Multi-language Support**: English (`en_us`) and Portuguese (`pt_br`)
 - **Debug Mode**: Optional debug output showing which agent handles each request
-- **Document Loading**: Supports PDF, text, and markdown documents
-- **File Upload Feature**: Users can upload files directly through the GUI interface for RAG processing
-- **Multiple LLM Support**: Google Gemini and LM Studio
+- **Rich Document Loading**: PDF, Word, Excel, CSV, HTML, RTF, PPTX, Markdown, plain text
+- **File Upload**: Upload files directly through the GUI for on-the-fly RAG ingestion
+- **Multiple LLM Providers**: Gemini, OpenAI, LM Studio, Ollama, Anthropic/Claude
+- **Standalone Executable**: Distributable `.exe` built with PyInstaller (no Python install required)
+
+## Requirements
+
+- Python 3.10+
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) (replaces pip/venv)
+
+Install `uv` once:
+
+```bash
+pip install uv
+```
 
 ## Installation
 
-Install required dependencies:
-
 ```bash
-pip install -r requirements.txt
+# Clone the repo
+git clone https://github.com/Gabriel-GM5/rpguide.git
+cd rpguide
+
+# Install all dependencies (creates .venv automatically)
+uv sync --dev
 ```
 
 ## Configuration
 
-Configure the application using environment variables. Create a `.env` file based on `.env.example`:
+Copy the example env file and fill in your values:
 
 ```bash
 cp .env.example .env
 ```
 
-Key variables:
+| Variable | Description |
+|----------|-------------|
+| `LLM_TYPE` | `gemini`, `openai`, `lmstudio`, `ollama`, `anthropic` |
+| `LLM_AI_API_KEY` | Provider API key (not required for `lmstudio` / `ollama`) |
+| `LLM_AI_BASE_URL` | Custom API base URL — required for `lmstudio` and `ollama`; optional override for `openai` |
+| `LLM_AI_MODEL` | Model ID string |
+| `EMBEDDINGS_AI_MODEL` | Embeddings model ID (unused when `LLM_TYPE=anthropic`) |
+| `LLM_AI_TEMPERATURE` | Temperature value (0.0–1.0) |
+| `LANGUAGE` | `en_us` or `pt_br` |
+| `AI_PERSONA` | Description of the AI assistant's personality |
+| `LOCAL_KNOWLEDGE_PATH` | Path to your local knowledge documents |
+| `LOCAL_KNOWLEDGE_DOC_TYPES` | Comma-separated file types, e.g. `pdf,txt,md` |
+| `DEBUG` | `true` / `false` — shows agent routing decisions in the UI |
+| `MODE` | `gui` (default) or `terminal` |
 
-- `LLM_TYPE` - e.g. `gemini` or `lmstudio`
-- `LLM_AI_API_KEY` - your provider API key
-- `LLM_AI_MODEL` - the model id to use
-- `EMBEDDINGS_AI_MODEL` - the embedding model id
-- `LLM_AI_TEMPERATURE` - temperature value (0.0-1.0)
-- `LANGUAGE` - `en_us` or `pt_br`
-- `AI_PERSONA` - description of the AI assistant's personality
-- `LOCAL_KNOWLEDGE_PATH` - path to your knowledge documents
-- `LOCAL_KNOWLEDGE_DOC_TYPES` - comma-separated file types (e.g., pdfs,txt,md)
-- `DEBUG` - `true` or `false` (when `true`, prints which agent is used)
-- `MODE` - `gui` for graphical interface or `terminal` for command-line chat (defaults to `gui`)
+### Provider-specific notes
 
-See `.env.example` for a complete template.
-
-For LM Studio, use:
+**LM Studio:**
 ```
 LLM_TYPE=lmstudio
-LLM_AI_API_KEY=http://localhost:1234/v1
+LLM_AI_BASE_URL=http://localhost:1234/v1
 LLM_AI_MODEL=<model-name>
 EMBEDDINGS_AI_MODEL=<model-name>
 ```
 
-## Running the Application
-
-Start the application in GUI mode (default):
-
-```bash
-python3 main.py
+**Ollama:**
+```
+LLM_TYPE=ollama
+LLM_AI_BASE_URL=http://localhost:11434
+LLM_AI_MODEL=<model-name>
+EMBEDDINGS_AI_MODEL=<model-name>
 ```
 
-Or start the application in terminal mode explicitly:
+**Anthropic/Claude** — RAG is disabled (no embeddings API); only `SimpleLLMAgent` is used.
+
+## Running
 
 ```bash
-python3 main.py terminal
+# GUI mode (default)
+uv run python main.py
+
+# Terminal mode
+uv run python main.py terminal
 ```
 
-The application will run in the mode specified by the `MODE` environment variable or command-line argument. When running with no arguments, it defaults to GUI mode. When using the `terminal` argument, it runs in command-line mode instead of GUI mode.
+The `MODE` env var also controls the default; the CLI argument takes precedence.
 
-### File Upload Feature
+### File Upload
 
-Users can upload files directly through the GUI interface using the "Upload Files" button. Uploaded files will be stored in the `uploads/` directory and automatically included in the RAG processing context.
+Use the **Upload Files** button in the GUI to add documents at runtime. Files are saved to `uploads/` and automatically ingested into the RAG pipeline. Supported formats: `.pdf`, `.txt`, `.doc`, `.docx`, `.xls`, `.xlsx`, `.md`, `.html`, `.htm`, `.rtf`, `.csv`, `.pptx`.
 
-The system supports uploading various document formats including:
-- PDF documents (.pdf)
-- Text files (.txt)
-- Word documents (.doc, .docx)
-- Excel spreadsheets (.xls, .xlsx)
-- Markdown files (.md)
-- HTML files (.html, .htm)
-- Rich Text Format files (.rtf)
-- CSV files (.csv)
+## Building a Standalone Executable
 
-Uploaded files are automatically processed and made available to the AI assistant for context-aware responses.
+The project ships with a PyInstaller spec (`rpguide.spec`) that produces a one-directory Windows executable with a d20 icon.
 
-### Application Structure
+**1. Generate the icon** (only needed once, or after modifying `create_icon.py`):
 
-The application is now structured into separate modules for better organization:
-- `gui/app.py`: Contains all GUI-related logic and the ChatApp class
-- `terminal/app.py`: Contains all terminal-based chat logic
-- `main.py`: Main entry point that determines which interface to launch based on configuration or command-line arguments
+```bash
+uv run python create_icon.py
+```
+
+This writes `icon.ico` to the project root.
+
+**2. Build the executable:**
+
+```bash
+uv run pyinstaller rpguide.spec
+```
+
+Output is placed in `dist/rpguide/`. Run `dist/rpguide/rpguide.exe` — no Python installation required on the target machine.
+
+> Build artifacts (`build/`, `dist/`) are git-ignored. Do not commit them.
+
+## Development
+
+```bash
+# Run tests
+uv run pytest tests/ -v
+
+# Run tests with coverage
+uv run pytest tests/ --cov=modules/ --cov-report=html
+
+# Lint / format
+uv run pylint modules/
+uv run black modules/
+uv run flake8 modules/
+
+# Add a dependency
+uv add <package>          # production
+uv add --dev <package>    # dev only
+```
 
 ## Project Structure
 
 ```
 .
-├── .env.example          # Example environment file
-├── .git/                 # Git repository
-├── .gitattributes
+├── .env.example              # Environment variable template
 ├── .gitignore
-├── docs/                 # Documentation files
-├── gui/                  # GUI application modules
-│   ├── __init__.py
-│   └── app.py            # GUI logic and ChatApp class
-├── LICENSE.md            # MIT License
-├── main.py               # Main entry point
-├── modules/              # Core modules
-│   ├── configs.py        # Configuration management
-│   ├── connectors/
-│   ├── connectors_manager.py
-│   ├── docs_manager.py
+├── create_icon.py            # Generates icon.ico for the exe build
+├── icon.ico                  # d20-themed application icon
+├── main.py                   # Entry point — dispatches to GUI or terminal
+├── modules/
+│   ├── configs.py            # Config + .env loading; PyInstaller path resolution
+│   ├── connectors/           # One file per LLM provider
+│   │   ├── anthropic_connector.py
+│   │   ├── gemini_connector.py
+│   │   ├── lmstudio_connector.py
+│   │   ├── ollama_connector.py
+│   │   └── openai_connector.py
+│   ├── connectors_manager.py # Agent orchestration (RAG / SimpleLLM / Analyzer)
+│   ├── docs_manager.py       # Document loading, chunking, FAISS indexing
 │   └── prompts/
 │       └── prompts_manager.py
-├── README.md             # This file
-├── requirements.txt      # Python dependencies
-└── terminal/             # Terminal application modules
-    ├── __init__.py
-    └── app.py            # Terminal logic
+├── gui_app.py                # ttkbootstrap GUI chat interface
+├── terminal_app.py           # Terminal chat interface
+├── rpguide.spec              # PyInstaller build spec
+├── pyproject.toml            # Project metadata and dependencies (uv)
+├── texts/                    # Localization files (*.properties)
+├── uploads/                  # Runtime file upload directory
+└── tests/                    # Pytest test suite
 ```
-
-## Dependencies
-
-The project requires the following Python packages (as listed in `requirements.txt`):
-
-- langchain_classic==1.0.1
-- langchain_community==0.4.1
-- langchain_core==1.2.8
-- langchain_google_genai==4.2.0
-- langchain_unstructured==1.0.1
-- python-dotenv==1.2.1
-- ttkbootstrap==1.20.1
-- PyMuPDF==1.26.7
-- faiss-cpu==1.13.2
-- langchain-lmstudio==0.1.0
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE.md file for details.
+This project is licensed under the MIT License — see [LICENSE.md](LICENSE.md) for details.
