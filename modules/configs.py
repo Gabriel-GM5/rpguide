@@ -1,8 +1,21 @@
 from dotenv import load_dotenv
 import os
+import sys
 import configparser
 
 load_dotenv()
+
+
+def _resource_base() -> str:
+    """Return the directory that contains bundled resources at runtime.
+
+    When running as a PyInstaller bundle (frozen), data files land in
+    sys._MEIPASS; otherwise fall back to the current working directory so that
+    the original relative-path behaviour is preserved for dev/test runs.
+    """
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        return sys._MEIPASS
+    return os.getcwd()
 
 def load_texts(filepath: str) -> dict:
     if not os.path.exists(filepath):
@@ -34,6 +47,8 @@ class Config:
         self.EMBEDDINGS_AI_MODEL = os.getenv("EMBEDDINGS_AI_MODEL", None)
         self.DEBUG = os.getenv("DEBUG", "False").lower() in ("1", "true", "yes", "y")
         self.MODE = os.getenv("MODE", "gui").lower()
-        self.texts = load_texts(f"texts/{self.LANGUAGE}.properties")
+        self.texts = load_texts(
+            os.path.join(_resource_base(), "texts", f"{self.LANGUAGE}.properties")
+        )
 
 config = Config()
