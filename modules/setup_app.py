@@ -1,25 +1,37 @@
 import os
+import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-from modules.configs import load_user_config, save_user_config
+from modules.configs import load_user_config, save_user_config, _resource_base
 
 _PROVIDERS = ["gemini", "openai", "lmstudio", "ollama", "anthropic"]
 _NEEDS_API_KEY = {"gemini", "openai", "anthropic"}
 _NEEDS_BASE_URL = {"lmstudio", "ollama"}
 _OPTIONAL_BASE_URL = {"openai"}
 _NO_EMBEDDINGS = {"anthropic"}
+_COMMON_DOC_TYPES = ["pdf", "txt", "md", "docx", "doc", "html", "csv", "rtf", "pptx"]
+
+
+def _set_icon(window: tk.BaseWidget) -> None:
+    icon_path = os.path.join(_resource_base(), "icon.ico")
+    if os.path.exists(icon_path):
+        try:
+            window.iconbitmap(icon_path)
+        except Exception:
+            pass
 
 
 class SetupApp:
-    def __init__(self, root: ttk.Window):
+    def __init__(self, root: tk.BaseWidget):
         self.root = root
         self.root.title("rpguide — Setup")
-        self.root.geometry("540x580")
+        self.root.geometry("540x620")
         self.root.resizable(False, False)
+        _set_icon(self.root)
         self._existing = load_user_config()
         self._build_form()
 
@@ -87,25 +99,42 @@ class SetupApp:
             row=0, column=1, padx=(4, 0)
         )
 
-        # Doc Types
-        self._doc_types_var = tk.StringVar(value=self._existing.get("LOCAL_KNOWLEDGE_DOC_TYPES", ""))
+        # Doc Types — checkboxes for common types + free-text for others
+        existing_types = {
+            t.strip()
+            for t in self._existing.get("LOCAL_KNOWLEDGE_DOC_TYPES", "").split(",")
+            if t.strip()
+        }
+        self._doc_type_vars: dict[str, tk.BooleanVar] = {
+            dt: tk.BooleanVar(value=dt in existing_types) for dt in _COMMON_DOC_TYPES
+        }
+        other_types = existing_types - set(_COMMON_DOC_TYPES)
+        self._doc_types_other_var = tk.StringVar(value=",".join(sorted(other_types)))
+
         self._add_label(frame, "Doc Types", 10)
-        ttk.Entry(frame, textvariable=self._doc_types_var).grid(row=10, column=1, sticky="ew", pady=4)
-        ttk.Label(frame, text="e.g. pdf,txt,md", font=("Arial", 8), foreground="gray").grid(
-            row=11, column=1, sticky="w"
-        )
+        dt_frame = ttk.Frame(frame)
+        dt_frame.grid(row=10, column=1, sticky="ew", pady=(4, 0))
+        for i, dt in enumerate(_COMMON_DOC_TYPES):
+            ttk.Checkbutton(dt_frame, text=dt, variable=self._doc_type_vars[dt]).grid(
+                row=i // 3, column=i % 3, sticky="w", padx=(0, 10), pady=1
+            )
+        other_row = ttk.Frame(dt_frame)
+        other_row.grid(row=3, column=0, columnspan=3, sticky="ew", pady=(4, 0))
+        other_row.columnconfigure(1, weight=1)
+        ttk.Label(other_row, text="Other:", font=("Arial", 9), foreground="gray").grid(row=0, column=0, sticky="w", padx=(0, 4))
+        ttk.Entry(other_row, textvariable=self._doc_types_other_var, font=("Arial", 9)).grid(row=0, column=1, sticky="ew")
 
         # Debug
         raw_debug = self._existing.get("DEBUG", "false")
         self._debug_var = tk.BooleanVar(value=str(raw_debug).lower() in ("true", "1", "yes", "y"))
-        self._add_label(frame, "Debug Mode", 12)
+        self._add_label(frame, "Debug Mode", 11)
         ttk.Checkbutton(frame, variable=self._debug_var, bootstyle="round-toggle").grid(
-            row=12, column=1, sticky="w", pady=4
+            row=11, column=1, sticky="w", pady=4
         )
 
         # Save button
         ttk.Button(frame, text="Save & Start", command=self._save, bootstyle="success", width=20).grid(
-            row=13, column=0, columnspan=2, pady=(20, 0)
+            row=12, column=0, columnspan=2, pady=(20, 0)
         )
 
         self._frame = frame
@@ -149,6 +178,11 @@ class SetupApp:
         if path:
             self._knowledge_var.set(path)
 
+    def _collect_doc_types(self) -> str:
+        checked = [dt for dt in _COMMON_DOC_TYPES if self._doc_type_vars[dt].get()]
+        other = [t.strip() for t in self._doc_types_other_var.get().split(",") if t.strip()]
+        return ",".join(checked + other)
+
     def _save(self):
         provider = self._provider_var.get()
 
@@ -177,7 +211,7 @@ class SetupApp:
             "LANGUAGE": self._lang_var.get(),
             "AI_PERSONA": self._persona_var.get().strip(),
             "LOCAL_KNOWLEDGE_PATH": self._knowledge_var.get().strip(),
-            "LOCAL_KNOWLEDGE_DOC_TYPES": self._doc_types_var.get().strip(),
+            "LOCAL_KNOWLEDGE_DOC_TYPES": self._collect_doc_types(),
             "DEBUG": "true" if self._debug_var.get() else "false",
         })
         self.root.destroy()
@@ -188,3 +222,21 @@ def run_setup() -> None:
     root = ttk.Window(themename="darkly")
     SetupApp(root)
     root.mainloop()
+
+
+def run_setup_dialog(parent: tk.Widget) -> bool:
+    """Open the setup wizard as a modal dialog attached to parent.
+
+    Returns True if the configuration was saved (i.e. it changed).
+    """
+    before = load_user_config()
+
+    dialog = tk.Toplevel(parent)
+    dialog.transient(parent)
+    dialog.grab_set()
+
+    SetupApp(dialog)
+    parent.wait_window(dialog)
+
+    after = load_user_config()
+    return before != after
